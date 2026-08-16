@@ -4,52 +4,561 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ฟอร์มส่งข้อมูลเข้า Google Sheet</title>
+  <title>ระบบลงทะเบียนออนไลน์ — Google Sheets Database</title>
+  
+  <!-- Google Fonts: Prompt & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       CSS Variables & Modern Design System
+       ========================================================================== */
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --primary-light: #eef2ff;
+      --primary-glow: rgba(79, 70, 229, 0.25);
+
+      --success: #10b981;
+      --success-light: #ecfdf5;
+      --success-border: #a7f3d0;
+
+      --danger: #ef4444;
+      --danger-light: #fef2f2;
+      --danger-border: #fecaca;
+
+      --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #eef2ff 50%, #f1f5f9 100%);
+      --surface: #ffffff;
+      --surface-subtle: #f8fafc;
+      --border-color: #e2e8f0;
+      --border-focus: #818cf8;
+
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --text-light: #94a3b8;
+
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 20px;
+      --radius-full: 9999px;
+
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+      --shadow-lg: 0 20px 35px -10px rgba(79, 70, 229, 0.12), 0 10px 15px -5px rgba(0, 0, 0, 0.04);
+
+      --font-th: 'Prompt', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-en: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Reset & Base */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-th);
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .main-container {
+      width: 100%;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    /* Header Logo & Title */
+    .brand-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .brand-icon-wrapper {
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, var(--primary), #06b6d4);
+      color: #ffffff;
+      border-radius: var(--radius-md);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+      box-shadow: 0 10px 20px var(--primary-glow);
+    }
+
+    .brand-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 0.35rem;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-subtitle {
+      font-size: 0.925rem;
+      color: var(--text-muted);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.3rem 0.85rem;
+      background: var(--surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-full);
+      font-size: 0.775rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-top: 0.75rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      background-color: var(--success);
+      border-radius: 50%;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+    }
+
+    /* Cards */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 2.25rem;
+      box-shadow: var(--shadow-lg);
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    .form-title {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-main);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.85rem;
+    }
+
+    /* Form Elements */
+    .form-group {
+      margin-bottom: 1.35rem;
+      position: relative;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-main);
+      margin-bottom: 0.45rem;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 1rem;
+      color: var(--text-light);
+      pointer-events: none;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.8rem 1rem 0.8rem 2.85rem;
+      font-family: inherit;
+      font-size: 0.95rem;
+      color: var(--text-main);
+      background-color: var(--surface-subtle);
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-md);
+      transition: var(--transition);
+      outline: none;
+    }
+
+    .form-control:focus {
+      background-color: #ffffff;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px var(--primary-glow);
+    }
+
+    .form-control:focus + .input-icon,
+    .form-group:focus-within .input-icon {
+      color: var(--primary);
+    }
+
+    .form-hint {
+      font-size: 0.775rem;
+      color: var(--text-muted);
+      margin-top: 0.35rem;
+    }
+
+    /* Buttons */
+    .btn {
+      width: 100%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      padding: 0.85rem 1.5rem;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      border: none;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+      color: #ffffff;
+      box-shadow: 0 4px 14px var(--primary-glow);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+    }
+
+    .btn-primary:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background-color: var(--surface-subtle);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      font-size: 0.925rem;
+      padding: 0.75rem 1.25rem;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background-color: #ffffff;
+      border-color: var(--primary);
+      color: var(--primary);
+      transform: translateY(-1px);
+    }
+
+    /* Status & Message Box */
+    .alert-box {
+      margin-top: 1.25rem;
+      padding: 0.875rem 1.15rem;
+      border-radius: var(--radius-md);
+      font-size: 0.9rem;
+      display: none;
+      align-items: flex-start;
+      gap: 0.65rem;
+      animation: fadeIn 0.3s ease forwards;
+    }
+
+    .alert-box.show {
+      display: flex;
+    }
+
+    .alert-success {
+      background-color: var(--success-light);
+      border: 1px solid var(--success-border);
+      color: #065f46;
+    }
+
+    .alert-danger {
+      background-color: var(--danger-light);
+      border: 1px solid var(--danger-border);
+      color: #991b1b;
+    }
+
+    .alert-info {
+      background-color: var(--primary-light);
+      border: 1px solid #c7d2fe;
+      color: #3730a3;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Counter Card (doGet Section) */
+    .counter-card {
+      background: var(--surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem 2rem;
+      box-shadow: var(--shadow-md);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .counter-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .counter-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .counter-display {
+      background: var(--surface-subtle);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      text-align: center;
+      min-height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    /* Loading Spinner */
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    .spinner-dark {
+      border-color: rgba(79, 70, 229, 0.2);
+      border-top-color: var(--primary);
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Footer */
+    .page-footer {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+  </style>
 </head>
 
 <body>
-  <h1>ฟอร์มลงทะเบียน</h1>
 
-  <!-- ฟอร์มกรอกข้อมูล -->
-  <form id="myForm">
-    <label>ชื่อ:</label><br>
-    <input type="text" name="name" required><br><br>
+  <div class="main-container">
+    <!-- Brand Header -->
+    <header class="brand-header">
+      <div class="brand-icon-wrapper">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <polyline points="16 11 18 13 22 9"></polyline>
+        </svg>
+      </div>
+      <h1 class="brand-title">ระบบลงทะเบียนออนไลน์</h1>
+      <p class="brand-subtitle">บันทึกข้อมูลเข้า Google Sheets แบบเรียลไทม์</p>
+      <div class="status-badge">
+        <span class="status-dot"></span>
+        <span>Google Apps Script Connected</span>
+      </div>
+    </header>
 
-    <label>อีเมล:</label><br>
-    <input type="email" name="email" required><br><br>
+    <!-- Registration Card -->
+    <main class="card">
+      <h2 class="form-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+        </svg>
+        กรอกข้อมูลลงทะเบียน
+      </h2>
 
-    <label>เบอร์โทร:</label><br>
-    <input type="tel" name="phone" required><br><br>
+      <!-- Form -->
+      <form id="myForm" novalidate>
+        <!-- Field 1: Name -->
+        <div class="form-group">
+          <label class="form-label" for="nameInput">ชื่อ - นามสกุล *</label>
+          <div class="input-wrapper">
+            <span class="input-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            </span>
+            <input type="text" id="nameInput" name="name" class="form-control" placeholder="เช่น นายสมชาย ใจดี" required autocomplete="name">
+          </div>
+        </div>
 
-    <button type="submit" id="sub">ส่งข้อมูล</button>
-  </form>
+        <!-- Field 2: Email -->
+        <div class="form-group">
+          <label class="form-label" for="emailInput">อีเมล *</label>
+          <div class="input-wrapper">
+            <span class="input-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+            </span>
+            <input type="email" id="emailInput" name="email" class="form-control" placeholder="example@domain.com" required autocomplete="email">
+          </div>
+        </div>
 
-  <p id="msg"></p>
+        <!-- Field 3: Phone (Formated to keep leading 0) -->
+        <div class="form-group">
+          <label class="form-label" for="phoneInput">เบอร์โทรศัพท์ *</label>
+          <div class="input-wrapper">
+            <span class="input-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+            </span>
+            <input type="tel" id="phoneInput" name="phone" class="form-control" placeholder="เช่น 0812345678" maxlength="12" required autocomplete="tel">
+          </div>
+          <p class="form-hint">✓ ระบบบันทึกเลข 0 นำหน้าลง Google Sheets ให้อัตโนมัติ</p>
+        </div>
 
-  <hr>
+        <!-- Submit Button -->
+        <button type="submit" id="sub" class="btn btn-primary">
+          <span id="subIcon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+          </span>
+          <span id="subText">บันทึกข้อมูลลงทะเบียน</span>
+        </button>
+      </form>
 
-  <!-- ปุ่มดึงข้อมูลจำนวนทั้งหมด (ทดสอบ doGet) -->
-  <button id="checkBtn">ดูจำนวนคนที่ลงทะเบียนแล้ว</button>
-  <p id="countMsg"></p>
+      <!-- Alert / Response Message -->
+      <div id="alertBox" class="alert-box">
+        <span id="alertIcon"></span>
+        <div id="alertMsg"></div>
+      </div>
+    </main>
 
+    <!-- Check Registered Count Card (doGet API) -->
+    <section class="counter-card">
+      <div class="counter-header">
+        <span class="counter-title">
+          📊 ตรวจสอบยอดผู้ลงทะเบียน (doGet)
+        </span>
+      </div>
+
+      <div id="countMsg" class="counter-display">
+        คลิกปุ่มด้านล่างเพื่อตรวจสอบจำนวน
+      </div>
+
+      <button id="checkBtn" class="btn btn-secondary">
+        <span id="checkIcon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+        </span>
+        <span id="checkText">ดูจำนวนคนที่ลงทะเบียนแล้ว</span>
+      </button>
+    </section>
+
+    <footer class="page-footer">
+      © 2026 Online Registration Portal &bull; Google Apps Script Integration
+    </footer>
+  </div>
+
+  <!-- ==========================================
+       JavaScript Logic
+       ========================================== -->
   <script>
     // ----------------------------------------------------
-    // 1) วาง URL ที่ได้จากตอน Deploy Web App ตรงนี้
+    // Web App URL จากการ Deploy Google Apps Script
     // ----------------------------------------------------
     const API_URL = "https://script.google.com/macros/s/AKfycbxVxiOzGLd8Lowh2Uoo4m7kgclh2czQH29wz3HY-LtKmB5GEX-CgjeO-HRdbouM0uyT3A/exec";
 
     const form = document.getElementById("myForm");
     const sub = document.getElementById("sub");
-    const msg = document.getElementById("msg");
+    const subText = document.getElementById("subText");
+    const subIcon = document.getElementById("subIcon");
+    const alertBox = document.getElementById("alertBox");
+    const alertMsg = document.getElementById("alertMsg");
+    const alertIcon = document.getElementById("alertIcon");
+
+    const phoneInput = document.getElementById("phoneInput");
+    const checkBtn = document.getElementById("checkBtn");
+    const countMsg = document.getElementById("countMsg");
+    const checkIcon = document.getElementById("checkIcon");
+    const checkText = document.getElementById("checkText");
+
+    // Helper: แสดงข้อความแจ้งเตือน (Alert)
+    function showAlert(message, type = 'success') {
+      alertBox.className = `alert-box alert-${type} show`;
+      alertMsg.textContent = message;
+
+      if (type === 'success') {
+        alertIcon.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+      } else if (type === 'danger') {
+        alertIcon.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
+      } else {
+        alertIcon.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`;
+      }
+    }
+
+    // Helper: ตรวจสอบและจัดฟอร์แมตเบอร์โทรศัพท์
+    phoneInput.addEventListener("input", function (e) {
+      // กรองให้รับเฉพาะตัวเลขและขีด
+      this.value = this.value.replace(/[^0-9-]/g, "");
+    });
 
     // ----- ส่งข้อมูล (เรียก doPost) -----
     form.addEventListener("submit", function (e) {
-      e.preventDefault(); // ไม่ให้หน้าเว็บรีโหลด
+      e.preventDefault();
 
+      const nameVal = document.getElementById("nameInput").value.trim();
+      const emailVal = document.getElementById("emailInput").value.trim();
+      let phoneVal = phoneInput.value.trim();
+
+      if (!nameVal || !emailVal || !phoneVal) {
+        showAlert("กรุณากรอกข้อมูลให้ครบทุกช่อง", "danger");
+        return;
+      }
+
+      // ปรับปุ่มเป็นสถานะกำลังโหลด
       sub.disabled = true;
-      sub.textContent = "กำลังส่ง...";
+      subText.textContent = "กำลังบันทึกข้อมูล...";
+      subIcon.innerHTML = `<div class="spinner"></div>`;
+      alertBox.className = "alert-box"; // ซ่อน alert ชั่วคราว
 
-      const data = new FormData(form);
+      // ----------------------------------------------------------------------
+      // ป้องกันเลข 0 นำหน้าหายใน Google Sheets:
+      // เติม single quote (') หน้าเบอร์โทรศัพท์ เพื่อบังคับให้ Google Sheets
+      // จัดเก็บเป็น String (ข้อความ) เสมอ ทำให้เลข 0 ตัวแรกไม่ถูกตัดทิ้ง
+      // ----------------------------------------------------------------------
+      const formattedPhone = phoneVal.startsWith("'") ? phoneVal : ("'" + phoneVal);
+
+      const data = new FormData();
+      data.append("name", nameVal);
+      data.append("email", emailVal);
+      data.append("phone", formattedPhone);
 
       fetch(API_URL, {
         method: "POST",
@@ -57,32 +566,38 @@
       })
         .then(res => res.text())
         .then(text => {
-          msg.textContent = text;
+          showAlert(text || "ลงทะเบียนสำเร็จเรียบร้อยแล้ว!", "success");
           form.reset();
         })
         .catch(err => {
-          msg.textContent = "เกิดข้อผิดพลาด: " + err;
+          showAlert("เกิดข้อผิดพลาดในการส่งข้อมูล: " + err, "danger");
         })
         .finally(() => {
           sub.disabled = false;
-          sub.textContent = "ส่งข้อมูล";
+          subText.textContent = "บันทึกข้อมูลลงทะเบียน";
+          subIcon.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>`;
         });
     });
 
     // ----- ดึงข้อมูล (เรียก doGet) -----
-    const checkBtn = document.getElementById("checkBtn");
-    const countMsg = document.getElementById("countMsg");
-
     checkBtn.addEventListener("click", function () {
-      countMsg.textContent = "กำลังโหลด...";
+      checkBtn.disabled = true;
+      checkText.textContent = "กำลังดึงข้อมูล...";
+      checkIcon.innerHTML = `<div class="spinner spinner-dark"></div>`;
+      countMsg.innerHTML = `<span style="color: var(--text-muted); font-size: 0.9rem;">กำลังโหลดข้อมูลจาก Google Sheets...</span>`;
 
-      fetch(API_URL) // ไม่ระบุ method = GET โดยอัตโนมัติ
+      fetch(API_URL)
         .then(res => res.text())
         .then(text => {
-          countMsg.textContent = text;
+          countMsg.innerHTML = `<span style="color: var(--primary); font-size: 1.25rem; font-weight: 700;">${text}</span>`;
         })
         .catch(err => {
-          countMsg.textContent = "เกิดข้อผิดพลาด: " + err;
+          countMsg.innerHTML = `<span style="color: var(--danger); font-size: 0.9rem;">เกิดข้อผิดพลาด: ${err}</span>`;
+        })
+        .finally(() => {
+          checkBtn.disabled = false;
+          checkText.textContent = "ดูจำนวนคนที่ลงทะเบียนแล้ว";
+          checkIcon.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>`;
         });
     });
   </script>
