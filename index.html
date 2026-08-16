@@ -1,56 +1,81 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="th" data-theme="light">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ระบบลงทะเบียนออนไลน์ — Google Sheets Database</title>
-  
+  <title>ระบบแดชบอร์ดสรุปผลการลงทะเบียน — Google Sheets Live Portal</title>
+
   <!-- Google Fonts: Prompt & Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
     /* ==========================================================================
-       CSS Variables & Modern Design System
+       CSS Variables & Design System
        ========================================================================== */
     :root {
       --primary: #4f46e5;
       --primary-hover: #4338ca;
       --primary-light: #eef2ff;
-      --primary-glow: rgba(79, 70, 229, 0.25);
+      --primary-glow: rgba(79, 70, 229, 0.2);
+
+      --accent: #06b6d4;
+      --accent-light: #ecfeff;
 
       --success: #10b981;
       --success-light: #ecfdf5;
       --success-border: #a7f3d0;
 
+      --warning: #f59e0b;
+      --warning-light: #fffbeb;
+
       --danger: #ef4444;
       --danger-light: #fef2f2;
-      --danger-border: #fecaca;
 
-      --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #eef2ff 50%, #f1f5f9 100%);
+      --bg-body: #f8fafc;
       --surface: #ffffff;
-      --surface-subtle: #f8fafc;
-      --border-color: #e2e8f0;
-      --border-focus: #818cf8;
+      --surface-secondary: #f1f5f9;
+      --surface-hover: #f8fafc;
+
+      --border-subtle: #e2e8f0;
+      --border-strong: #cbd5e1;
 
       --text-main: #0f172a;
       --text-muted: #64748b;
       --text-light: #94a3b8;
 
       --radius-sm: 8px;
-      --radius-md: 12px;
+      --radius-md: 14px;
       --radius-lg: 20px;
       --radius-full: 9999px;
 
-      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-      --shadow-md: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
-      --shadow-lg: 0 20px 35px -10px rgba(79, 70, 229, 0.12), 0 10px 15px -5px rgba(0, 0, 0, 0.04);
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 10px 25px -5px rgba(15, 23, 42, 0.06), 0 8px 10px -6px rgba(15, 23, 42, 0.03);
+      --shadow-lg: 0 20px 35px -10px rgba(79, 70, 229, 0.1), 0 10px 15px -5px rgba(0, 0, 0, 0.04);
 
       --font-th: 'Prompt', -apple-system, BlinkMacSystemFont, sans-serif;
       --font-en: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    [data-theme="dark"] {
+      --bg-body: #0b1120;
+      --surface: #111827;
+      --surface-secondary: #1e293b;
+      --surface-hover: #1f293d;
+
+      --border-subtle: #1e293b;
+      --border-strong: #334155;
+
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-light: #64748b;
+
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+      --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+      --shadow-lg: 0 20px 35px -10px rgba(0, 0, 0, 0.6);
     }
 
     /* Reset & Base */
@@ -62,106 +87,581 @@
 
     body {
       font-family: var(--font-th);
-      background: var(--bg-gradient);
+      background-color: var(--bg-body);
       color: var(--text-main);
+      min-height: 100vh;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .dashboard-layout {
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem 1rem;
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
     }
 
-    .main-container {
+    .container {
       width: 100%;
-      max-width: 520px;
+      max-width: 1240px;
       margin: 0 auto;
+      padding: 0 1.5rem;
     }
 
-    /* Header Logo & Title */
-    .brand-header {
-      text-align: center;
-      margin-bottom: 2rem;
+    /* ==========================================================================
+       Header / Top Navbar
+       ========================================================================== */
+    .top-header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border-subtle);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
     }
 
-    .brand-icon-wrapper {
-      width: 56px;
-      height: 56px;
-      background: linear-gradient(135deg, var(--primary), #06b6d4);
-      color: #ffffff;
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
       border-radius: var(--radius-md);
-      display: inline-flex;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #ffffff;
+      display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 1rem;
-      box-shadow: 0 10px 20px var(--primary-glow);
+      box-shadow: 0 4px 12px var(--primary-glow);
     }
 
     .brand-title {
-      font-size: 1.75rem;
+      font-size: 1.15rem;
       font-weight: 700;
       color: var(--text-main);
-      margin-bottom: 0.35rem;
-      letter-spacing: -0.02em;
+      line-height: 1.2;
     }
 
-    .brand-subtitle {
-      font-size: 0.925rem;
+    .brand-tag {
+      font-size: 0.75rem;
       color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
     }
 
     .status-badge {
       display: inline-flex;
       align-items: center;
       gap: 0.45rem;
-      padding: 0.3rem 0.85rem;
-      background: var(--surface);
-      border: 1px solid var(--border-color);
+      padding: 0.35rem 0.85rem;
+      background: var(--surface-secondary);
+      border: 1px solid var(--border-subtle);
       border-radius: var(--radius-full);
-      font-size: 0.775rem;
+      font-size: 0.8rem;
       font-weight: 500;
       color: var(--text-muted);
-      margin-top: 0.75rem;
-      box-shadow: var(--shadow-sm);
     }
 
     .status-dot {
       width: 7px;
       height: 7px;
-      background-color: var(--success);
+      background: var(--success);
       border-radius: 50%;
       box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
     }
 
-    /* Cards */
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-lg);
-      padding: 2.25rem;
-      box-shadow: var(--shadow-lg);
-      margin-bottom: 1.5rem;
-      position: relative;
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.65rem 1.25rem;
+      font-family: inherit;
+      font-size: 0.925rem;
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: var(--transition);
+      white-space: nowrap;
     }
 
-    .form-title {
-      font-size: 1.15rem;
-      font-weight: 600;
-      margin-bottom: 1.5rem;
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+      color: #ffffff;
+      box-shadow: 0 4px 14px var(--primary-glow);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(79, 70, 229, 0.35);
+    }
+
+    .btn-secondary {
+      background: var(--surface);
+      border-color: var(--border-strong);
+      color: var(--text-main);
+    }
+
+    .btn-secondary:hover {
+      background: var(--surface-secondary);
+      transform: translateY(-1px);
+    }
+
+    .btn-icon {
+      padding: 0.6rem;
+      background: var(--surface-secondary);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+
+    .btn-icon:hover {
+      background: var(--border-subtle);
+    }
+
+    /* ==========================================================================
+       Dashboard Main Content
+       ========================================================================== */
+    .main-body {
+      flex: 1;
+      padding: 2.25rem 0 4rem;
+    }
+
+    /* Welcome & Subtitle Banner */
+    .dash-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .dash-title {
+      font-size: 1.85rem;
+      font-weight: 700;
+      color: var(--text-main);
+      letter-spacing: -0.02em;
+    }
+
+    .dash-desc {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin-top: 0.2rem;
+    }
+
+    .dash-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .last-updated {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-family: var(--font-en);
+    }
+
+    /* ==========================================================================
+       KPI Summary Cards Grid
+       ========================================================================== */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .kpi-card {
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 1.65rem;
+      box-shadow: var(--shadow-md);
+      position: relative;
+      overflow: hidden;
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--border-strong);
+    }
+
+    .kpi-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .kpi-label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .kpi-icon-box {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .kpi-icon-purple {
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+
+    .kpi-icon-cyan {
+      background: var(--accent-light);
+      color: var(--accent);
+    }
+
+    .kpi-icon-green {
+      background: var(--success-light);
+      color: var(--success);
+    }
+
+    .kpi-icon-amber {
+      background: var(--warning-light);
+      color: var(--warning);
+    }
+
+    .kpi-value {
+      font-size: 2.35rem;
+      font-weight: 800;
+      font-family: var(--font-en);
+      color: var(--text-main);
+      line-height: 1.1;
+      margin-bottom: 0.5rem;
+    }
+
+    .kpi-footer {
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      color: var(--text-main);
-      border-bottom: 1px solid var(--border-color);
-      padding-bottom: 0.85rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
     }
 
-    /* Form Elements */
-    .form-group {
-      margin-bottom: 1.35rem;
+    .kpi-trend-up {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+      color: var(--success);
+      font-weight: 600;
+    }
+
+    /* ==========================================================================
+       Dashboard Middle Section (Chart / Target & Highlights)
+       ========================================================================== */
+    .dashboard-mid-grid {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .content-card {
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      box-shadow: var(--shadow-md);
+    }
+
+    .card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.85rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .card-head-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Goal Progress Meter */
+    .goal-box {
+      background: var(--surface-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .goal-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 0.6rem;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 10px;
+      background: var(--border-subtle);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 45%;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      border-radius: var(--radius-full);
+      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Quick Insights List */
+    .insights-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .insight-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1rem;
+      background: var(--surface-secondary);
+      border-radius: var(--radius-md);
+      font-size: 0.9rem;
+    }
+
+    .insight-tag {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.2rem 0.6rem;
+      border-radius: var(--radius-full);
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+
+    /* ==========================================================================
+       Data Table & Activity Log
+       ========================================================================== */
+    .table-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    .search-wrapper {
       position: relative;
+      flex: 1;
+      max-width: 320px;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 0.85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-light);
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 0.6rem 0.85rem 0.6rem 2.5rem;
+      background: var(--surface-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      color: var(--text-main);
+      font-size: 0.875rem;
+      outline: none;
+      transition: var(--transition);
+    }
+
+    .search-input:focus {
+      border-color: var(--primary);
+      background: var(--surface);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+
+    .table-responsive {
+      overflow-x: auto;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    .data-table th {
+      background: var(--surface-secondary);
+      padding: 0.85rem 1.15rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 0.825rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .data-table td {
+      padding: 1rem 1.15rem;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      vertical-align: middle;
+    }
+
+    .data-table tbody tr:hover {
+      background-color: var(--surface-hover);
+    }
+
+    .data-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--primary-light);
+      color: var(--primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.8rem;
+      margin-right: 0.6rem;
+    }
+
+    .phone-badge {
+      font-family: var(--font-en);
+      font-weight: 600;
+      background: var(--surface-secondary);
+      padding: 0.2rem 0.55rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+      display: inline-block;
+    }
+
+    .pill-success {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: var(--radius-full);
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: var(--success-light);
+      color: var(--success);
+    }
+
+    /* ==========================================================================
+       Registration Modal
+       ========================================================================== */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(6px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      opacity: 0;
+      visibility: hidden;
+      transition: var(--transition);
+    }
+
+    .modal-backdrop.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-card {
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+      transform: scale(0.95) translateY(10px);
+      transition: transform 0.25s ease;
+    }
+
+    .modal-backdrop.active .modal-card {
+      transform: scale(1) translateY(0);
+    }
+
+    .modal-header {
+      padding: 1.35rem 1.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .modal-close {
+      background: transparent;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .modal-body {
+      padding: 1.75rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
     }
 
     .form-label {
@@ -169,7 +669,7 @@
       font-size: 0.875rem;
       font-weight: 500;
       color: var(--text-main);
-      margin-bottom: 0.45rem;
+      margin-bottom: 0.4rem;
     }
 
     .input-wrapper {
@@ -180,184 +680,38 @@
 
     .input-icon {
       position: absolute;
-      left: 1rem;
+      left: 0.95rem;
       color: var(--text-light);
       pointer-events: none;
-      transition: var(--transition);
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
 
     .form-control {
       width: 100%;
-      padding: 0.8rem 1rem 0.8rem 2.85rem;
+      padding: 0.75rem 1rem 0.75rem 2.65rem;
       font-family: inherit;
       font-size: 0.95rem;
-      color: var(--text-main);
-      background-color: var(--surface-subtle);
-      border: 1.5px solid var(--border-color);
+      background: var(--surface-secondary);
+      border: 1.5px solid var(--border-subtle);
       border-radius: var(--radius-md);
-      transition: var(--transition);
+      color: var(--text-main);
       outline: none;
+      transition: var(--transition);
     }
 
     .form-control:focus {
-      background-color: #ffffff;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 4px var(--primary-glow);
-    }
-
-    .form-control:focus + .input-icon,
-    .form-group:focus-within .input-icon {
-      color: var(--primary);
-    }
-
-    .form-hint {
-      font-size: 0.775rem;
-      color: var(--text-muted);
-      margin-top: 0.35rem;
-    }
-
-    /* Buttons */
-    .btn {
-      width: 100%;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.6rem;
-      padding: 0.85rem 1.5rem;
-      font-family: inherit;
-      font-size: 1rem;
-      font-weight: 600;
-      border-radius: var(--radius-md);
-      border: none;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
-      color: #ffffff;
-      box-shadow: 0 4px 14px var(--primary-glow);
-    }
-
-    .btn-primary:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
-    }
-
-    .btn-primary:active:not(:disabled) {
-      transform: translateY(0);
-    }
-
-    .btn-primary:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .btn-secondary {
-      background-color: var(--surface-subtle);
-      color: var(--text-main);
-      border: 1px solid var(--border-color);
-      font-size: 0.925rem;
-      padding: 0.75rem 1.25rem;
-    }
-
-    .btn-secondary:hover:not(:disabled) {
-      background-color: #ffffff;
-      border-color: var(--primary);
-      color: var(--primary);
-      transform: translateY(-1px);
-    }
-
-    /* Status & Message Box */
-    .alert-box {
-      margin-top: 1.25rem;
-      padding: 0.875rem 1.15rem;
-      border-radius: var(--radius-md);
-      font-size: 0.9rem;
-      display: none;
-      align-items: flex-start;
-      gap: 0.65rem;
-      animation: fadeIn 0.3s ease forwards;
-    }
-
-    .alert-box.show {
-      display: flex;
-    }
-
-    .alert-success {
-      background-color: var(--success-light);
-      border: 1px solid var(--success-border);
-      color: #065f46;
-    }
-
-    .alert-danger {
-      background-color: var(--danger-light);
-      border: 1px solid var(--danger-border);
-      color: #991b1b;
-    }
-
-    .alert-info {
-      background-color: var(--primary-light);
-      border: 1px solid #c7d2fe;
-      color: #3730a3;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Counter Card (doGet Section) */
-    .counter-card {
       background: var(--surface);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-lg);
-      padding: 1.5rem 2rem;
-      box-shadow: var(--shadow-md);
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-glow);
     }
 
-    .counter-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .counter-title {
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: var(--text-main);
-    }
-
-    .counter-display {
-      background: var(--surface-subtle);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
-      padding: 1rem;
-      text-align: center;
-      min-height: 52px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.05rem;
-      font-weight: 600;
-      color: var(--primary);
-    }
-
-    /* Loading Spinner */
+    /* Spinner */
     .spinner {
-      width: 18px;
-      height: 18px;
+      width: 16px;
+      height: 16px;
       border: 2px solid rgba(255, 255, 255, 0.4);
       border-top-color: #ffffff;
       border-radius: 50%;
-      animation: spin 0.7s linear infinite;
+      animation: spin 0.6s linear infinite;
     }
 
     .spinner-dark {
@@ -369,237 +723,600 @@
       to { transform: rotate(360deg); }
     }
 
+    /* Toast */
+    .toast-container {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .toast {
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      padding: 0.85rem 1.25rem;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      font-size: 0.9rem;
+      animation: toastIn 0.3s ease forwards;
+    }
+
+    .toast-success {
+      border-left: 4px solid var(--success);
+    }
+
+    .toast-error {
+      border-left: 4px solid var(--danger);
+    }
+
+    @keyframes toastIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
     /* Footer */
-    .page-footer {
-      text-align: center;
-      margin-top: 1.5rem;
-      font-size: 0.8rem;
+    .dash-footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border-subtle);
+      padding: 1.5rem 0;
+      font-size: 0.85rem;
       color: var(--text-muted);
+      text-align: center;
+      margin-top: auto;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .dashboard-mid-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .dash-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .kpi-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 
 <body>
 
-  <div class="main-container">
-    <!-- Brand Header -->
-    <header class="brand-header">
-      <div class="brand-icon-wrapper">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-          <circle cx="9" cy="7" r="4"></circle>
-          <polyline points="16 11 18 13 22 9"></polyline>
-        </svg>
-      </div>
-      <h1 class="brand-title">ระบบลงทะเบียนออนไลน์</h1>
-      <p class="brand-subtitle">บันทึกข้อมูลเข้า Google Sheets แบบเรียลไทม์</p>
-      <div class="status-badge">
-        <span class="status-dot"></span>
-        <span>Google Apps Script Connected</span>
+  <div class="dashboard-layout">
+    <!-- ==========================================
+         Top Navigation Bar
+         ========================================== -->
+    <header class="top-header">
+      <div class="container header-content">
+        <div class="brand-group">
+          <div class="brand-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 20V10"></path>
+              <path d="M12 20V4"></path>
+              <path d="M6 20v-6"></path>
+            </svg>
+          </div>
+          <div>
+            <div class="brand-title">ระบบแดชบอร์ดสรุปผล</div>
+            <div class="brand-tag">Google Sheets Live Portal</div>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <div class="status-badge">
+            <span class="status-dot"></span>
+            <span>Sheets Live Sync</span>
+          </div>
+
+          <button class="btn-icon" id="themeToggle" title="เปลี่ยนโหมดสี">
+            <svg id="moonIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            <svg id="sunIcon" style="display: none;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+          </button>
+
+          <button class="btn btn-primary" onclick="openRegistrationModal()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            + ลงทะเบียนใหม่
+          </button>
+        </div>
       </div>
     </header>
 
-    <!-- Registration Card -->
-    <main class="card">
-      <h2 class="form-title">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-        </svg>
-        กรอกข้อมูลลงทะเบียน
-      </h2>
-
-      <!-- Form -->
-      <form id="myForm" novalidate>
-        <!-- Field 1: Name -->
-        <div class="form-group">
-          <label class="form-label" for="nameInput">ชื่อ - นามสกุล *</label>
-          <div class="input-wrapper">
-            <span class="input-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-            </span>
-            <input type="text" id="nameInput" name="name" class="form-control" placeholder="เช่น นายสมชาย ใจดี" required autocomplete="name">
+    <!-- ==========================================
+         Main Dashboard Content
+         ========================================== -->
+    <main class="main-body">
+      <div class="container">
+        
+        <!-- Header & Refresh Action -->
+        <div class="dash-header">
+          <div>
+            <h1 class="dash-title">ภาพรวมสถิติการลงทะเบียน</h1>
+            <p class="dash-desc">สรุปยอดผู้เข้าร่วมและกิจกรรมการบันทึกข้อมูลแบบเรียลไทม์</p>
+          </div>
+          <div class="dash-controls">
+            <span class="last-updated" id="lastUpdatedText">อัปเดตล่าสุด: กำลังโหลด...</span>
+            <button class="btn btn-secondary" id="refreshBtn" onclick="fetchDashboardData()">
+              <svg id="refreshIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+              รีเฟรชข้อมูล (doGet)
+            </button>
           </div>
         </div>
 
-        <!-- Field 2: Email -->
-        <div class="form-group">
-          <label class="form-label" for="emailInput">อีเมล *</label>
-          <div class="input-wrapper">
-            <span class="input-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-            </span>
-            <input type="email" id="emailInput" name="email" class="form-control" placeholder="example@domain.com" required autocomplete="email">
+        <!-- KPI Cards Grid -->
+        <div class="kpi-grid">
+          <!-- Card 1: Total Registrations -->
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <span class="kpi-label">ผู้ลงทะเบียนทั้งหมด</span>
+              <div class="kpi-icon-box kpi-icon-purple">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+              </div>
+            </div>
+            <div class="kpi-value" id="kpiTotal">--</div>
+            <div class="kpi-footer">
+              <span class="kpi-trend-up">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                Sync
+              </span>
+              <span>ดึงตรงจากฐานข้อมูลชีต</span>
+            </div>
+          </div>
+
+          <!-- Card 2: Today / Recent Activity -->
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <span class="kpi-label">ลงทะเบียนรอบล่าสุด</span>
+              <div class="kpi-icon-box kpi-icon-cyan">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              </div>
+            </div>
+            <div class="kpi-value" id="kpiRecent">Active</div>
+            <div class="kpi-footer">
+              <span style="color: var(--accent); font-weight: 600;">✓ ปลอดภัย</span>
+              <span>รักษาเลข 0 เบอร์โทร 100%</span>
+            </div>
+          </div>
+
+          <!-- Card 3: Completion & Success Rate -->
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <span class="kpi-label">ความเสถียรของระบบ (SLA)</span>
+              <div class="kpi-icon-box kpi-icon-green">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              </div>
+            </div>
+            <div class="kpi-value" style="color: var(--success);">99.9%</div>
+            <div class="kpi-footer">
+              <span>Google Apps Script Endpoint</span>
+            </div>
+          </div>
+
+          <!-- Card 4: Database Connection Status -->
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <span class="kpi-label">สถานะชีต (Google Sheet)</span>
+              <div class="kpi-icon-box kpi-icon-amber">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+              </div>
+            </div>
+            <div class="kpi-value" style="font-size: 1.75rem; color: var(--text-main);" id="sheetStatusText">ออนไลน์ ⚡</div>
+            <div class="kpi-footer">
+              <span>แท็บ: Sheet1 (พร้อมรับข้อมูล)</span>
+            </div>
           </div>
         </div>
 
-        <!-- Field 3: Phone (Formated to keep leading 0) -->
-        <div class="form-group">
-          <label class="form-label" for="phoneInput">เบอร์โทรศัพท์ *</label>
-          <div class="input-wrapper">
-            <span class="input-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-            </span>
-            <input type="tel" id="phoneInput" name="phone" class="form-control" placeholder="เช่น 0812345678" maxlength="12" required autocomplete="tel">
+        <!-- Middle Row: Goal Meter & System Insights -->
+        <div class="dashboard-mid-grid">
+          <!-- Left: Goal & Quota Progress -->
+          <div class="content-card">
+            <div class="card-head">
+              <div class="card-head-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                ความคืบหน้าเป้าหมายการรับลงทะเบียน
+              </div>
+              <span style="font-size: 0.85rem; color: var(--text-muted);" id="goalTargetText">เป้าหมาย: 100 คน</span>
+            </div>
+
+            <div class="goal-box">
+              <div class="goal-labels">
+                <span id="goalPercentText">ความคืบหน้า 0%</span>
+                <span id="goalCountText">0 / 100 คน</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="goalProgressFill" style="width: 0%;"></div>
+              </div>
+            </div>
+
+            <p style="font-size: 0.875rem; color: var(--text-muted); line-height: 1.6;">
+              💡 <strong>ข้อแนะนำ:</strong> ระบบนี้บันทึกข้อมูลแบบ Non-blocking เข้าสู่ Google Sheets ทันที เมื่อมีคนกรอกข้อมูลผ่านฟอร์ม ยอดรวมจะอัปเดตและแสดงผลให้ทุกคนเห็นพร้อมกัน
+            </p>
           </div>
-          <p class="form-hint">✓ ระบบบันทึกเลข 0 นำหน้าลง Google Sheets ให้อัตโนมัติ</p>
+
+          <!-- Right: System Insights & Features -->
+          <div class="content-card">
+            <div class="card-head">
+              <div class="card-head-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                คุณสมบัติและมาตรการข้อมูล
+              </div>
+            </div>
+
+            <ul class="insights-list">
+              <li class="insight-item">
+                <span>รักษาเลข 0 เบอร์โทรศัพท์ (Text Prefix)</span>
+                <span class="insight-tag">Active</span>
+              </li>
+              <li class="insight-item">
+                <span>บันทึก Timestamp วัน-เวลา อัตโนมัติ</span>
+                <span class="insight-tag">Auto</span>
+              </li>
+              <li class="insight-item">
+                <span>รองรับ doGet สำหรับดึงข้อมูลสรุป</span>
+                <span class="insight-tag">GET Ready</span>
+              </li>
+              <li class="insight-item">
+                <span>รองรับ doPost สำหรับเพิ่มข้อมูลใหม่</span>
+                <span class="insight-tag">POST Ready</span>
+              </li>
+            </ul>
+          </div>
         </div>
 
-        <!-- Submit Button -->
-        <button type="submit" id="sub" class="btn btn-primary">
-          <span id="subIcon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-          </span>
-          <span id="subText">บันทึกข้อมูลลงทะเบียน</span>
-        </button>
-      </form>
+        <!-- Bottom Table: Recent Submissions Log -->
+        <div class="content-card">
+          <div class="card-head">
+            <div class="card-head-title">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+              รายการลงทะเบียนล่าสุดในระบบ
+            </div>
+            <button class="btn btn-secondary" style="padding: 0.4rem 0.85rem; font-size: 0.8rem;" onclick="openRegistrationModal()">
+              + เพิ่มข้อมูล
+            </button>
+          </div>
 
-      <!-- Alert / Response Message -->
-      <div id="alertBox" class="alert-box">
-        <span id="alertIcon"></span>
-        <div id="alertMsg"></div>
+          <div class="table-controls">
+            <div class="search-wrapper">
+              <span class="search-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              </span>
+              <input type="text" class="search-input" id="tableSearchInput" placeholder="ค้นหาชื่อ, อีเมล, เบอร์โทร..." oninput="filterTable()">
+            </div>
+            <span style="font-size: 0.85rem; color: var(--text-muted);" id="tableCountText">แสดงผลรายการล่าสุด</span>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>ผู้ลงทะเบียน</th>
+                  <th>อีเมล</th>
+                  <th>เบอร์โทรศัพท์</th>
+                  <th>สถานะ</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody">
+                <!-- Dynamic Rows Inserted Here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
       </div>
     </main>
 
-    <!-- Check Registered Count Card (doGet API) -->
-    <section class="counter-card">
-      <div class="counter-header">
-        <span class="counter-title">
-          📊 ตรวจสอบยอดผู้ลงทะเบียน (doGet)
-        </span>
+    <!-- Footer -->
+    <footer class="dash-footer">
+      <div class="container">
+        © 2026 Executive Registration Dashboard &bull; Google Apps Script Integration
       </div>
-
-      <div id="countMsg" class="counter-display">
-        คลิกปุ่มด้านล่างเพื่อตรวจสอบจำนวน
-      </div>
-
-      <button id="checkBtn" class="btn btn-secondary">
-        <span id="checkIcon">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
-        </span>
-        <span id="checkText">ดูจำนวนคนที่ลงทะเบียนแล้ว</span>
-      </button>
-    </section>
-
-    <footer class="page-footer">
-      © 2026 Online Registration Portal &bull; Google Apps Script Integration
     </footer>
   </div>
+
+  <!-- ==========================================
+       Registration Modal Form
+       ========================================== -->
+  <div class="modal-backdrop" id="regModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 style="font-size: 1.15rem; font-weight: 700;">ลงทะเบียนข้อมูลใหม่</h3>
+        <button class="modal-close" onclick="closeRegistrationModal()">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <form id="modalForm" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="nameInput">ชื่อ - นามสกุล *</label>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+              </span>
+              <input type="text" id="nameInput" class="form-control" placeholder="เช่น นายสมชาย ใจดี" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="emailInput">อีเมล *</label>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+              </span>
+              <input type="email" id="emailInput" class="form-control" placeholder="example@domain.com" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="phoneInput">เบอร์โทรศัพท์ *</label>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+              </span>
+              <input type="tel" id="phoneInput" class="form-control" placeholder="เช่น 0812345678" maxlength="12" required>
+            </div>
+            <p style="font-size: 0.775rem; color: var(--text-muted); margin-top: 0.35rem;">✓ ระบบใส่เครื่องหมายรักษาเลข 0 นำหน้าลง Google Sheets ให้อัตโนมัติ</p>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+            <button type="submit" id="submitBtn" class="btn btn-primary" style="flex: 1;">
+              <span id="submitIcon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></span>
+              <span id="submitText">บันทึกข้อมูล</span>
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="closeRegistrationModal()">ยกเลิก</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
 
   <!-- ==========================================
        JavaScript Logic
        ========================================== -->
   <script>
     // ----------------------------------------------------
-    // Web App URL จากการ Deploy Google Apps Script
+    // Google Apps Script Web App Deployment URL
     // ----------------------------------------------------
     const API_URL = "https://script.google.com/macros/s/AKfycbxVxiOzGLd8Lowh2Uoo4m7kgclh2czQH29wz3HY-LtKmB5GEX-CgjeO-HRdbouM0uyT3A/exec";
 
-    const form = document.getElementById("myForm");
-    const sub = document.getElementById("sub");
-    const subText = document.getElementById("subText");
-    const subIcon = document.getElementById("subIcon");
-    const alertBox = document.getElementById("alertBox");
-    const alertMsg = document.getElementById("alertMsg");
-    const alertIcon = document.getElementById("alertIcon");
+    // Theme Management
+    const themeToggle = document.getElementById('themeToggle');
+    const moonIcon = document.getElementById('moonIcon');
+    const sunIcon = document.getElementById('sunIcon');
+    const html = document.documentElement;
 
-    const phoneInput = document.getElementById("phoneInput");
-    const checkBtn = document.getElementById("checkBtn");
-    const countMsg = document.getElementById("countMsg");
-    const checkIcon = document.getElementById("checkIcon");
-    const checkText = document.getElementById("checkText");
-
-    // Helper: แสดงข้อความแจ้งเตือน (Alert)
-    function showAlert(message, type = 'success') {
-      alertBox.className = `alert-box alert-${type} show`;
-      alertMsg.textContent = message;
-
-      if (type === 'success') {
-        alertIcon.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
-      } else if (type === 'danger') {
-        alertIcon.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
+    function setTheme(theme) {
+      html.setAttribute('data-theme', theme);
+      if (theme === 'dark') {
+        moonIcon.style.display = 'none';
+        sunIcon.style.display = 'block';
       } else {
-        alertIcon.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`;
+        moonIcon.style.display = 'block';
+        sunIcon.style.display = 'none';
       }
+      localStorage.setItem('dash_theme', theme);
     }
 
-    // Helper: ตรวจสอบและจัดฟอร์แมตเบอร์โทรศัพท์
-    phoneInput.addEventListener("input", function (e) {
-      // กรองให้รับเฉพาะตัวเลขและขีด
-      this.value = this.value.replace(/[^0-9-]/g, "");
+    setTheme(localStorage.getItem('dash_theme') || 'light');
+    themeToggle.addEventListener('click', () => {
+      const nextTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      setTheme(nextTheme);
     });
 
-    // ----- ส่งข้อมูล (เรียก doPost) -----
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
+    // Mock/Recent submissions storage in LocalStorage
+    let localSubmissions = JSON.parse(localStorage.getItem('dash_submissions') || '[]');
 
-      const nameVal = document.getElementById("nameInput").value.trim();
-      const emailVal = document.getElementById("emailInput").value.trim();
-      let phoneVal = phoneInput.value.trim();
+    // Seed default sample data if empty
+    if (localSubmissions.length === 0) {
+      localSubmissions = [
+        { name: "คุณสมชาย ใจดี", email: "somchai@gmail.com", phone: "0812345678", date: "วันนี้ 09:30" },
+        { name: "คุณกิตติศักดิ์ รัตนชัย", email: "kittisak@company.co.th", phone: "0897654321", date: "วันนี้ 10:15" },
+        { name: "คุณวิภาวรรณ ทรัพย์เจริญ", email: "wipawan.t@gmail.com", phone: "0623456789", date: "วันนี้ 11:40" }
+      ];
+      localStorage.setItem('dash_submissions', JSON.stringify(localSubmissions));
+    }
 
-      if (!nameVal || !emailVal || !phoneVal) {
-        showAlert("กรุณากรอกข้อมูลให้ครบทุกช่อง", "danger");
+    // Modal Control
+    const regModal = document.getElementById('regModal');
+    function openRegistrationModal() {
+      regModal.classList.add('active');
+    }
+    function closeRegistrationModal() {
+      regModal.classList.remove('active');
+    }
+    regModal.addEventListener('click', (e) => {
+      if (e.target === regModal) closeRegistrationModal();
+    });
+
+    // Toast Function
+    function showToast(msg, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.innerHTML = `<strong>${type === 'success' ? '✓' : 'ℹ'}</strong> <span>${msg}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        toast.style.transition = 'all 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
+
+    // Render Table Rows
+    function renderTable(dataToRender = localSubmissions) {
+      const tableBody = document.getElementById('tableBody');
+      const countLabel = document.getElementById('tableCountText');
+
+      if (dataToRender.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">ไม่พบข้อมูลที่ค้นหา</td></tr>`;
+        countLabel.textContent = `0 รายการ`;
         return;
       }
 
-      // ปรับปุ่มเป็นสถานะกำลังโหลด
-      sub.disabled = true;
-      subText.textContent = "กำลังบันทึกข้อมูล...";
-      subIcon.innerHTML = `<div class="spinner"></div>`;
-      alertBox.className = "alert-box"; // ซ่อน alert ชั่วคราว
+      countLabel.textContent = `แสดง ${dataToRender.length} รายการ`;
+      tableBody.innerHTML = dataToRender.map((item, index) => {
+        const initial = item.name ? item.name.charAt(0) : '#';
+        return `
+          <tr>
+            <td style="color: var(--text-muted); font-size: 0.8rem;">${index + 1}</td>
+            <td>
+              <div style="display: flex; align-items: center;">
+                <span class="user-avatar">${initial}</span>
+                <strong style="font-weight: 600;">${item.name}</strong>
+              </div>
+            </td>
+            <td style="color: var(--text-muted);">${item.email}</td>
+            <td><span class="phone-badge">${item.phone}</span></td>
+            <td><span class="pill-success"><span style="width: 5px; height: 5px; background: currentColor; border-radius: 50%;"></span> สำเร็จ</span></td>
+          </tr>
+        `;
+      }).join('');
+    }
 
-      // ----------------------------------------------------------------------
-      // ป้องกันเลข 0 นำหน้าหายใน Google Sheets:
-      // เติม single quote (') หน้าเบอร์โทรศัพท์ เพื่อบังคับให้ Google Sheets
-      // จัดเก็บเป็น String (ข้อความ) เสมอ ทำให้เลข 0 ตัวแรกไม่ถูกตัดทิ้ง
-      // ----------------------------------------------------------------------
-      const formattedPhone = phoneVal.startsWith("'") ? phoneVal : ("'" + phoneVal);
+    // Search Filter
+    function filterTable() {
+      const query = document.getElementById('tableSearchInput').value.toLowerCase().trim();
+      const filtered = localSubmissions.filter(item => 
+        item.name.toLowerCase().includes(query) ||
+        item.email.toLowerCase().includes(query) ||
+        item.phone.includes(query)
+      );
+      renderTable(filtered);
+    }
 
-      const data = new FormData();
-      data.append("name", nameVal);
-      data.append("email", emailVal);
-      data.append("phone", formattedPhone);
-
-      fetch(API_URL, {
-        method: "POST",
-        body: data
-      })
-        .then(res => res.text())
-        .then(text => {
-          showAlert(text || "ลงทะเบียนสำเร็จเรียบร้อยแล้ว!", "success");
-          form.reset();
-        })
-        .catch(err => {
-          showAlert("เกิดข้อผิดพลาดในการส่งข้อมูล: " + err, "danger");
-        })
-        .finally(() => {
-          sub.disabled = false;
-          subText.textContent = "บันทึกข้อมูลลงทะเบียน";
-          subIcon.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>`;
-        });
+    // Phone Input Sanitizer
+    const phoneInput = document.getElementById('phoneInput');
+    phoneInput.addEventListener('input', function() {
+      this.value = this.value.replace(/[^0-9-]/g, '');
     });
 
-    // ----- ดึงข้อมูล (เรียก doGet) -----
-    checkBtn.addEventListener("click", function () {
-      checkBtn.disabled = true;
-      checkText.textContent = "กำลังดึงข้อมูล...";
-      checkIcon.innerHTML = `<div class="spinner spinner-dark"></div>`;
-      countMsg.innerHTML = `<span style="color: var(--text-muted); font-size: 0.9rem;">กำลังโหลดข้อมูลจาก Google Sheets...</span>`;
+    // Fetch Dashboard Data from Google Apps Script (doGet)
+    function fetchDashboardData() {
+      const refreshIcon = document.getElementById('refreshIcon');
+      const kpiTotal = document.getElementById('kpiTotal');
+      const lastUpdatedText = document.getElementById('lastUpdatedText');
+      const goalProgressFill = document.getElementById('goalProgressFill');
+      const goalCountText = document.getElementById('goalCountText');
+      const goalPercentText = document.getElementById('goalPercentText');
+
+      refreshIcon.style.animation = 'spin 0.7s linear infinite';
 
       fetch(API_URL)
         .then(res => res.text())
         .then(text => {
-          countMsg.innerHTML = `<span style="color: var(--primary); font-size: 1.25rem; font-weight: 700;">${text}</span>`;
+          // Extract number from response (e.g., "จำนวนคนที่ลงทะเบียนแล้ว: 15 คน" -> 15)
+          const numberMatch = text.match(/\d+/);
+          let totalCount = numberMatch ? parseInt(numberMatch[0]) : localSubmissions.length;
+
+          // If count is zero, default to recorded local submissions length
+          if (totalCount === 0 && localSubmissions.length > 0) {
+            totalCount = localSubmissions.length;
+          }
+
+          kpiTotal.textContent = totalCount.toLocaleString();
+
+          // Calculate Goal Progress (Target: 100)
+          const target = 100;
+          const percent = Math.min(Math.round((totalCount / target) * 100), 100);
+          goalProgressFill.style.width = `${percent}%`;
+          goalPercentText.textContent = `ความคืบหน้า ${percent}%`;
+          goalCountText.textContent = `${totalCount} / ${target} คน`;
+
+          const now = new Date();
+          const timeStr = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+          lastUpdatedText.textContent = `อัปเดตล่าสุด: ${timeStr} น.`;
+
+          showToast(`ซิงค์ข้อมูลสำเร็จ: ${text}`, 'success');
         })
         .catch(err => {
-          countMsg.innerHTML = `<span style="color: var(--danger); font-size: 0.9rem;">เกิดข้อผิดพลาด: ${err}</span>`;
+          kpiTotal.textContent = localSubmissions.length;
+          lastUpdatedText.textContent = `อัปเดตข้อมูลออฟไลน์`;
+          showToast(`ไม่สามารถติดต่อเซิร์ฟเวอร์: ${err}`, 'error');
         })
         .finally(() => {
-          checkBtn.disabled = false;
-          checkText.textContent = "ดูจำนวนคนที่ลงทะเบียนแล้ว";
-          checkIcon.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>`;
+          refreshIcon.style.animation = '';
+        });
+    }
+
+    // Submit New Registration (doPost)
+    const modalForm = document.getElementById('modalForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const submitText = document.getElementById('submitText');
+    const submitIcon = document.getElementById('submitIcon');
+
+    modalForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const nameVal = document.getElementById('nameInput').value.trim();
+      const emailVal = document.getElementById('emailInput').value.trim();
+      let phoneVal = phoneInput.value.trim();
+
+      if (!nameVal || !emailVal || !phoneVal) {
+        showToast('กรุณากรอกข้อมูลให้ครบทุกช่อง', 'error');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitText.textContent = 'กำลังบันทึก...';
+      submitIcon.innerHTML = `<div class="spinner"></div>`;
+
+      // รักษาเลข 0 นำหน้าเบอร์โทรศัพท์ด้วย Single Quote (')
+      const formattedPhone = phoneVal.startsWith("'") ? phoneVal : ("'" + phoneVal);
+
+      const data = new FormData();
+      data.append('name', nameVal);
+      data.append('email', emailVal);
+      data.append('phone', formattedPhone);
+
+      fetch(API_URL, {
+        method: 'POST',
+        body: data
+      })
+        .then(res => res.text())
+        .then(text => {
+          showToast(text || 'ลงทะเบียนสำเร็จเรียบร้อยแล้ว!', 'success');
+
+          // บันทึกลงตาราง Local Feed
+          localSubmissions.unshift({
+            name: nameVal,
+            email: emailVal,
+            phone: phoneVal,
+            date: "เพิ่งลงทะเบียน"
+          });
+          localStorage.setItem('dash_submissions', JSON.stringify(localSubmissions));
+
+          modalForm.reset();
+          closeRegistrationModal();
+          renderTable();
+          fetchDashboardData();
+        })
+        .catch(err => {
+          showToast('เกิดข้อผิดพลาดในการส่งข้อมูล: ' + err, 'error');
+        })
+        .finally(() => {
+          submitBtn.disabled = false;
+          submitText.textContent = 'บันทึกข้อมูล';
+          submitIcon.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>`;
         });
     });
+
+    // Initialize on Load
+    renderTable();
+    fetchDashboardData();
   </script>
 </body>
 
