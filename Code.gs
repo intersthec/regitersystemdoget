@@ -1,45 +1,213 @@
-// ==============================================
-// Code.gs - โค้ด Google Apps Script
-// เชื่อม Google Sheet กับฟอร์ม HTML ด้วย doGet และ doPost
-// ==============================================
+// ==========================================================================
+// Code.gs - Google Apps Script Backend (Web App)
+// รองรับ: ลงทะเบียนใหม่, อัปโหลดรูปโปรไฟล์เข้า Google Drive, แก้ไขข้อมูล, และส่งข้อมูล JSON
+// ==========================================================================
 
-// 1) ระบุแผ่นงานที่ต้องการบันทึก (ตรวจสอบชื่อแท็บชีตให้ตรงกับใน Google Sheets เช่น "Sheet1" หรือ "ชีต1")
-const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Sheet1");
+// 1) กำหนด ID โฟลเดอร์ Google Drive สำหรับจัดเก็บรูปภาพ
+const FOLDER_ID = "1hRl3JLjIxzFtdbbQMcSAuTdwHawZ2cBB";
 
-// 2) doPost = ทำงานตอน "บันทึกข้อมูล" (ฟอร์มส่งข้อมูลมาแบบ POST)
-function doPost(e) {
+// 2) กำหนดชีตที่ใช้บันทึกข้อมูล (ชื่อแท็บใน Google Sheets)
+const SHEET_NAME = "Sheet1";
+
+function getSheet() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName(SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(SHEET_NAME);
+  }
+  
+  // ตรวจสอบและสร้างหัวตารางอัตโนมัติหากชีตยังว่าง
+  if (sheet.getLastRow() === 0) {
+    sheet.appendRow(["Timestamp", "Name", "Email", "Phone", "PhotoUrl"]);
+    sheet.getRange(1, 1, 1, 5).setFontWeight("bold").setBackground("#eef2ff");
+  }
+  return sheet;
+}
+
+// --------------------------------------------------------------------------
+// บันทึกรูปภาพลง Google Drive และรับลิงก์ URL
+// --------------------------------------------------------------------------
+function saveImageToDrive(base64Data, fileName, mimeType) {
   try {
-    const data = e.parameter; // ข้อมูลจากฟอร์ม: data.name, data.email, data.phone
-
-    // จัดการเบอร์โทรศัพท์ให้มีเลข 0 นำหน้าเสมอ ไม่ถูกแปลงเป็นตัวเลขในชีต
-    let phoneStr = data.phone ? data.phone.toString().trim() : "";
-    if (phoneStr && !phoneStr.startsWith("'")) {
-      phoneStr = "'" + phoneStr;
+    if (!base64Data || base64Data.length < 20) return "";
+    
+    const folder = DriveApp.getFolderById(FOLDER_ID);
+    
+    // ตัด header ของ base64 ออกถ้ามี (เช่น data:image/png;base64,...)
+    let cleanBase64 = base64Data;
+    let actualMime = mimeType || "image/jpeg";
+    
+    if (base64Data.indexOf(",") !== -1) {
+      const parts = base64Data.split(",");
+      const meta = parts[0];
+      cleanBase64 = parts[1];
+      
+      const mimeMatch = meta.match(/data:([^;]+);/);
+      if (mimeMatch && mimeMatch[1]) {
+        actualMime = mimeMatch[1];
+      }
     }
-
-    // เพิ่มแถวใหม่ในชีต เรียงตามคอลัมน์ A, B, C, D
-    sheet.appendRow([
-      new Date(),   // A: วันเวลาที่บันทึก
-      data.name,    // B: ชื่อ-นามสกุล
-      data.email,   // C: อีเมล
-      phoneStr      // D: เบอร์โทร (คงเลข 0 นำหน้าไว้เสมอ)
-    ]);
-
-    return ContentService.createTextOutput("บันทึกข้อมูลสำเร็จเรียบร้อยแล้ว");
-  } catch (error) {
-    return ContentService.createTextOutput("เกิดข้อผิดพลาด: " + error.toString());
+    
+    const decodedBytes = Utilities.base64Decode(cleanBase64);
+    const timeStamp = new Date().getTime();
+    const finalFileName = (fileName || "profile_" + timeStamp) + ".jpg";
+    
+    const blob = Utilities.newBlob(decodedBytes, actualMime, finalFileName);
+    const file = folder.createFile(blob);
+    
+    // ตั้งค่าสิทธิ์ให้ทุกคนที่มีลิงก์สามารถดูรูปภาพได้
+    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    
+    // ส่งกลับลิงก์แสดงผลรูปภาพความเร็วสูง
+    return "https://lh3.googleusercontent.com/d/" + file.getId();
+  } catch (err) {
+    Logger.log("Error saving to Drive: " + err.toString());
+    return "";
   }
 }
 
-// 3) doGet = ทำงานตอน "ดึงข้อมูล" (เปิด URL ตรง ๆ หรือ fetch แบบไม่ระบุ method)
+// --------------------------------------------------------------------------
+// 3) doPost = ทำงานตอน "บันทึกข้อมูลใหม่" หรือ "แก้ไขข้อมูล"
+// --------------------------------------------------------------------------
+function doPost(e) {
+  try {
+    const sheet = getSheet();
+    const data = e.parameter;
+    const action = data.action || "register"; // "register" หรือ "update"
+    
+    const name = data.name ? data.name.trim() : "";
+    const email = data.email ? data.email.trim() : "";
+    const oldEmail = data.oldEmail ? data.oldEmail.trim() : email;
+    let phone = data.phone ? data.phone.trim() : "";
+    const imageBase64 = data.imageBase64 || "";
+    const imageMime = data.imageMime || "image/jpeg";
+    
+    // รักษาเลข 0 นำหน้าเบอร์โทรศัพท์
+    let phoneFormatted = phone;
+    if (phoneFormatted && !phoneFormatted.startsWith("'")) {
+      phoneFormatted = "'" + phoneFormatted;
+    }
+    
+    // จัดการอัปโหลดรูปภาพถ้ามีส่งมา
+    let photoUrl = data.photoUrl || "";
+    if (imageBase64 && imageBase64.length > 50) {
+      const uploadedUrl = saveImageToDrive(imageBase64, "profile_" + email.replace(/[^a-zA-Z0-9]/g, "_"), imageMime);
+      if (uploadedUrl) {
+        photoUrl = uploadedUrl;
+      }
+    }
+    
+    const allData = sheet.getDataRange().getValues();
+    
+    // กรณี: แก้ไขข้อมูลที่มีอยู่แล้ว (Update)
+    if (action === "update") {
+      let rowIndexToUpdate = -1;
+      
+      // ค้นหาแถวด้วย oldEmail หรือ email
+      for (let i = 1; i < allData.length; i++) {
+        const rowEmail = allData[i][2] ? allData[i][2].toString().trim() : "";
+        if (rowEmail.toLowerCase() === oldEmail.toLowerCase() || rowEmail.toLowerCase() === email.toLowerCase()) {
+          rowIndexToUpdate = i + 1; // 1-indexed for Sheet
+          break;
+        }
+      }
+      
+      if (rowIndexToUpdate > 0) {
+        const existingPhoto = allData[rowIndexToUpdate - 1][4] || "";
+        const finalPhoto = photoUrl || existingPhoto;
+        
+        sheet.getRange(rowIndexToUpdate, 1, 1, 5).setValues([[
+          new Date(),
+          name,
+          email,
+          phoneFormatted,
+          finalPhoto
+        ]]);
+        
+        return ContentService.createTextOutput(JSON.stringify({
+          status: "success",
+          message: "แก้ไขข้อมูลและบันทึกรูปโปรไฟล์เรียบร้อยแล้ว",
+          photoUrl: finalPhoto
+        })).setMimeType(ContentService.MimeType.JSON);
+      }
+    }
+    
+    // กรณี: ลงทะเบียนใหม่ (Register)
+    sheet.appendRow([
+      new Date(),
+      name,
+      email,
+      phoneFormatted,
+      photoUrl
+    ]);
+    
+    return ContentService.createTextOutput(JSON.stringify({
+      status: "success",
+      message: "ลงทะเบียนและบันทึกรูปโปรไฟล์สำเร็จเรียบร้อยแล้ว",
+      photoUrl: photoUrl
+    })).setMimeType(ContentService.MimeType.JSON);
+    
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({
+      status: "error",
+      message: "เกิดข้อผิดพลาด: " + error.toString()
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+// --------------------------------------------------------------------------
+// 4) doGet = ทำงานตอน "ดึงข้อมูลสรุป & รายชื่อโปรไฟล์" (GET Request)
+// --------------------------------------------------------------------------
 function doGet(e) {
   try {
-    // นับจำนวนแถวข้อมูลทั้งหมด (ลบแถวหัวตารางออก 1 แถว)
-    const lastRow = sheet.getLastRow();
-    const total = lastRow > 1 ? lastRow - 1 : 0;
-
-    return ContentService.createTextOutput("จำนวนคนที่ลงทะเบียนแล้ว: " + total + " คน");
+    const sheet = getSheet();
+    const allData = sheet.getDataRange().getValues();
+    
+    if (allData.length <= 1) {
+      return ContentService.createTextOutput(JSON.stringify({
+        status: "success",
+        total: 0,
+        records: []
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+    
+    const rows = allData.slice(1); // ตัดหัวตารางออก
+    const total = rows.length;
+    
+    const records = rows.map((r, i) => {
+      const rawPhone = r[3] ? r[3].toString() : "";
+      const cleanPhone = rawPhone.replace(/^'/, "");
+      
+      let formattedDate = "";
+      if (r[0] instanceof Date) {
+        formattedDate = Utilities.formatDate(r[0], "Asia/Bangkok", "dd/MM/yyyy HH:mm");
+      } else {
+        formattedDate = r[0] ? r[0].toString() : "";
+      }
+      
+      return {
+        id: i + 1,
+        date: formattedDate,
+        name: r[1] ? r[1].toString() : "",
+        email: r[2] ? r[2].toString() : "",
+        phone: cleanPhone,
+        photoUrl: r[4] ? r[4].toString() : ""
+      };
+    }).reverse(); // เอาคนล่าสุดขึ้นก่อน
+    
+    const result = {
+      status: "success",
+      total: total,
+      records: records
+    };
+    
+    return ContentService.createTextOutput(JSON.stringify(result))
+      .setMimeType(ContentService.MimeType.JSON);
+      
   } catch (error) {
-    return ContentService.createTextOutput("เกิดข้อผิดพลาด: " + error.toString());
+    return ContentService.createTextOutput(JSON.stringify({
+      status: "error",
+      message: "เกิดข้อผิดพลาด: " + error.toString()
+    })).setMimeType(ContentService.MimeType.JSON);
   }
 }

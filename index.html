@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ระบบแดชบอร์ดสรุปผลการลงทะเบียน — Google Sheets Live Portal</title>
+  <title>ระบบแดชบอร์ดลงทะเบียนและโปรไฟล์สมาชิก — Google Drive & Sheets</title>
 
   <!-- Google Fonts: Prompt & Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,13 +13,13 @@
 
   <style>
     /* ==========================================================================
-       CSS Variables & Design System
+       CSS Variables & Modern Design System
        ========================================================================== */
     :root {
       --primary: #4f46e5;
       --primary-hover: #4338ca;
       --primary-light: #eef2ff;
-      --primary-glow: rgba(79, 70, 229, 0.2);
+      --primary-glow: rgba(79, 70, 229, 0.22);
 
       --accent: #06b6d4;
       --accent-light: #ecfeff;
@@ -53,7 +53,7 @@
 
       --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
       --shadow-md: 0 10px 25px -5px rgba(15, 23, 42, 0.06), 0 8px 10px -6px rgba(15, 23, 42, 0.03);
-      --shadow-lg: 0 20px 35px -10px rgba(79, 70, 229, 0.1), 0 10px 15px -5px rgba(0, 0, 0, 0.04);
+      --shadow-lg: 0 20px 35px -10px rgba(79, 70, 229, 0.12), 0 10px 15px -5px rgba(0, 0, 0, 0.04);
 
       --font-th: 'Prompt', -apple-system, BlinkMacSystemFont, sans-serif;
       --font-en: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -242,6 +242,26 @@
       background: var(--border-subtle);
     }
 
+    .btn-edit {
+      padding: 0.35rem 0.75rem;
+      font-size: 0.8rem;
+      border-radius: var(--radius-sm);
+      background: var(--primary-light);
+      color: var(--primary);
+      border: 1px solid rgba(79, 70, 229, 0.2);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .btn-edit:hover {
+      background: var(--primary);
+      color: #ffffff;
+    }
+
     /* ==========================================================================
        Dashboard Main Content
        ========================================================================== */
@@ -250,7 +270,6 @@
       padding: 2.25rem 0 4rem;
     }
 
-    /* Welcome & Subtitle Banner */
     .dash-header {
       display: flex;
       align-items: flex-end;
@@ -286,7 +305,7 @@
     }
 
     /* ==========================================================================
-       KPI Summary Cards Grid
+       KPI Cards Grid
        ========================================================================== */
     .kpi-grid {
       display: grid;
@@ -301,8 +320,6 @@
       border-radius: var(--radius-lg);
       padding: 1.65rem;
       box-shadow: var(--shadow-md);
-      position: relative;
-      overflow: hidden;
       transition: var(--transition);
       display: flex;
       flex-direction: column;
@@ -337,25 +354,10 @@
       justify-content: center;
     }
 
-    .kpi-icon-purple {
-      background: var(--primary-light);
-      color: var(--primary);
-    }
-
-    .kpi-icon-cyan {
-      background: var(--accent-light);
-      color: var(--accent);
-    }
-
-    .kpi-icon-green {
-      background: var(--success-light);
-      color: var(--success);
-    }
-
-    .kpi-icon-amber {
-      background: var(--warning-light);
-      color: var(--warning);
-    }
+    .kpi-icon-purple { background: var(--primary-light); color: var(--primary); }
+    .kpi-icon-cyan { background: var(--accent-light); color: var(--accent); }
+    .kpi-icon-green { background: var(--success-light); color: var(--success); }
+    .kpi-icon-amber { background: var(--warning-light); color: var(--warning); }
 
     .kpi-value {
       font-size: 2.35rem;
@@ -374,16 +376,8 @@
       color: var(--text-muted);
     }
 
-    .kpi-trend-up {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.2rem;
-      color: var(--success);
-      font-weight: 600;
-    }
-
     /* ==========================================================================
-       Dashboard Middle Section (Chart / Target & Highlights)
+       Dashboard Middle Section (Target & Drive Info)
        ========================================================================== */
     .dashboard-mid-grid {
       display: grid;
@@ -417,7 +411,6 @@
       gap: 0.5rem;
     }
 
-    /* Goal Progress Meter */
     .goal-box {
       background: var(--surface-secondary);
       border: 1px solid var(--border-subtle);
@@ -444,13 +437,12 @@
 
     .progress-bar-fill {
       height: 100%;
-      width: 45%;
+      width: 0%;
       background: linear-gradient(90deg, var(--primary), var(--accent));
       border-radius: var(--radius-full);
       transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* Quick Insights List */
     .insights-list {
       list-style: none;
       display: flex;
@@ -492,7 +484,7 @@
     .search-wrapper {
       position: relative;
       flex: 1;
-      max-width: 320px;
+      max-width: 340px;
     }
 
     .search-icon {
@@ -547,7 +539,7 @@
     }
 
     .data-table td {
-      padding: 1rem 1.15rem;
+      padding: 0.9rem 1.15rem;
       border-bottom: 1px solid var(--border-subtle);
       color: var(--text-main);
       vertical-align: middle;
@@ -561,18 +553,38 @@
       border-bottom: none;
     }
 
-    .user-avatar {
-      width: 32px;
-      height: 32px;
+    /* Avatar Display */
+    .user-profile-cell {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .avatar-wrapper {
+      width: 42px;
+      height: 42px;
       border-radius: 50%;
+      overflow: hidden;
       background: var(--primary-light);
-      color: var(--primary);
-      display: inline-flex;
+      border: 2px solid var(--border-subtle);
+      display: flex;
       align-items: center;
       justify-content: center;
+      flex-shrink: 0;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .avatar-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .avatar-fallback {
       font-weight: 700;
-      font-size: 0.8rem;
-      margin-right: 0.6rem;
+      color: var(--primary);
+      font-size: 0.9rem;
+      text-transform: uppercase;
     }
 
     .phone-badge {
@@ -585,21 +597,94 @@
       display: inline-block;
     }
 
-    .pill-success {
-      display: inline-flex;
+    /* ==========================================================================
+       Photo Upload Component in Modal
+       ========================================================================== */
+    .photo-upload-container {
+      display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 0.3rem;
-      padding: 0.2rem 0.6rem;
-      border-radius: var(--radius-full);
-      font-size: 0.75rem;
-      font-weight: 600;
-      background: var(--success-light);
-      color: var(--success);
+      margin-bottom: 1.5rem;
     }
 
-    /* ==========================================================================
-       Registration Modal
-       ========================================================================== */
+    .photo-preview-box {
+      width: 104px;
+      height: 104px;
+      border-radius: 50%;
+      border: 3px solid var(--primary);
+      background: var(--surface-secondary);
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      box-shadow: 0 4px 15px var(--primary-glow);
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .photo-preview-box:hover {
+      transform: scale(1.04);
+      border-color: var(--accent);
+    }
+
+    .photo-preview-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+
+    .photo-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .photo-preview-box:hover .photo-overlay {
+      opacity: 1;
+    }
+
+    .photo-icon-placeholder {
+      color: var(--primary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .photo-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.65rem;
+    }
+
+    .btn-photo-action {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: var(--radius-full);
+      background: var(--surface-secondary);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .btn-photo-action:hover {
+      color: var(--danger);
+      border-color: var(--danger);
+    }
+
+    /* Modal Form Elements */
     .modal-backdrop {
       position: fixed;
       top: 0;
@@ -628,11 +713,14 @@
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-lg);
       width: 100%;
-      max-width: 480px;
+      max-width: 500px;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
       overflow: hidden;
       transform: scale(0.95) translateY(10px);
       transition: transform 0.25s ease;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
     }
 
     .modal-backdrop.active .modal-card {
@@ -640,7 +728,7 @@
     }
 
     .modal-header {
-      padding: 1.35rem 1.75rem;
+      padding: 1.25rem 1.75rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -658,10 +746,11 @@
 
     .modal-body {
       padding: 1.75rem;
+      overflow-y: auto;
     }
 
     .form-group {
-      margin-bottom: 1.25rem;
+      margin-bottom: 1.15rem;
     }
 
     .form-label {
@@ -669,7 +758,7 @@
       font-size: 0.875rem;
       font-weight: 500;
       color: var(--text-main);
-      margin-bottom: 0.4rem;
+      margin-bottom: 0.35rem;
     }
 
     .input-wrapper {
@@ -714,11 +803,6 @@
       animation: spin 0.6s linear infinite;
     }
 
-    .spinner-dark {
-      border-color: rgba(79, 70, 229, 0.2);
-      border-top-color: var(--primary);
-    }
-
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
@@ -748,13 +832,8 @@
       animation: toastIn 0.3s ease forwards;
     }
 
-    .toast-success {
-      border-left: 4px solid var(--success);
-    }
-
-    .toast-error {
-      border-left: 4px solid var(--danger);
-    }
+    .toast-success { border-left: 4px solid var(--success); }
+    .toast-error { border-left: 4px solid var(--danger); }
 
     @keyframes toastIn {
       from { transform: translateX(100%); opacity: 0; }
@@ -772,21 +851,13 @@
       margin-top: auto;
     }
 
-    /* Responsive */
     @media (max-width: 900px) {
-      .dashboard-mid-grid {
-        grid-template-columns: 1fr;
-      }
+      .dashboard-mid-grid { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 600px) {
-      .dash-header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      .kpi-grid {
-        grid-template-columns: 1fr;
-      }
+      .dash-header { flex-direction: column; align-items: flex-start; }
+      .kpi-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -802,21 +873,20 @@
         <div class="brand-group">
           <div class="brand-icon">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M18 20V10"></path>
-              <path d="M12 20V4"></path>
-              <path d="M6 20v-6"></path>
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
             </svg>
           </div>
           <div>
-            <div class="brand-title">ระบบแดชบอร์ดสรุปผล</div>
-            <div class="brand-tag">Google Sheets Live Portal</div>
+            <div class="brand-title">ระบบแดชบอร์ดสรุปผล & โปรไฟล์สมาชิก</div>
+            <div class="brand-tag">Google Drive Storage & Sheets Database</div>
           </div>
         </div>
 
         <div class="header-actions">
           <div class="status-badge">
             <span class="status-dot"></span>
-            <span>Sheets Live Sync</span>
+            <span>Drive Sync Active</span>
           </div>
 
           <button class="btn-icon" id="themeToggle" title="เปลี่ยนโหมดสี">
@@ -824,7 +894,7 @@
             <svg id="sunIcon" style="display: none;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
           </button>
 
-          <button class="btn btn-primary" onclick="openRegistrationModal()">
+          <button class="btn btn-primary" onclick="openRegistrationModal('register')">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
             + ลงทะเบียนใหม่
           </button>
@@ -841,8 +911,8 @@
         <!-- Header & Refresh Action -->
         <div class="dash-header">
           <div>
-            <h1 class="dash-title">ภาพรวมสถิติการลงทะเบียน</h1>
-            <p class="dash-desc">สรุปยอดผู้เข้าร่วมและกิจกรรมการบันทึกข้อมูลแบบเรียลไทม์</p>
+            <h1 class="dash-title">ภาพรวมสมาชิกและสถิติโปรไฟล์</h1>
+            <p class="dash-desc">จัดการรูปภาพประจำตัว อัปโหลดเข้า Google Drive และแก้ไขข้อมูลสมาชิก</p>
           </div>
           <div class="dash-controls">
             <span class="last-updated" id="lastUpdatedText">อัปเดตล่าสุด: กำลังโหลด...</span>
@@ -858,73 +928,70 @@
           <!-- Card 1: Total Registrations -->
           <div class="kpi-card">
             <div class="kpi-top">
-              <span class="kpi-label">ผู้ลงทะเบียนทั้งหมด</span>
+              <span class="kpi-label">สมาชิกทั้งหมดในระบบ</span>
               <div class="kpi-icon-box kpi-icon-purple">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
               </div>
             </div>
             <div class="kpi-value" id="kpiTotal">--</div>
             <div class="kpi-footer">
-              <span class="kpi-trend-up">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"></polyline></svg>
-                Sync
-              </span>
-              <span>ดึงตรงจากฐานข้อมูลชีต</span>
+              <span style="color: var(--success); font-weight: 600;">✓ Real-time</span>
+              <span>บันทึกใน Google Sheets</span>
             </div>
           </div>
 
-          <!-- Card 2: Today / Recent Activity -->
+          <!-- Card 2: Profile Photos on Drive -->
           <div class="kpi-card">
             <div class="kpi-top">
-              <span class="kpi-label">ลงทะเบียนรอบล่าสุด</span>
+              <span class="kpi-label">พื้นที่เก็บรูป Google Drive</span>
               <div class="kpi-icon-box kpi-icon-cyan">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
               </div>
             </div>
-            <div class="kpi-value" id="kpiRecent">Active</div>
+            <div class="kpi-value" id="kpiDrivePhotos">Cloud</div>
             <div class="kpi-footer">
-              <span style="color: var(--accent); font-weight: 600;">✓ ปลอดภัย</span>
-              <span>รักษาเลข 0 เบอร์โทร 100%</span>
+              <span style="color: var(--accent); font-weight: 600;">โฟลเดอร์:</span>
+              <span style="font-family: var(--font-en); font-size: 0.75rem;">1hRl3JLjIxzFtd...</span>
             </div>
           </div>
 
-          <!-- Card 3: Completion & Success Rate -->
+          <!-- Card 3: Phone Number Preservation -->
           <div class="kpi-card">
             <div class="kpi-top">
-              <span class="kpi-label">ความเสถียรของระบบ (SLA)</span>
+              <span class="kpi-label">ฟอร์แมตเบอร์โทรศัพท์</span>
               <div class="kpi-icon-box kpi-icon-green">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
               </div>
             </div>
-            <div class="kpi-value" style="color: var(--success);">99.9%</div>
+            <div class="kpi-value" style="color: var(--success);">0x-xxx</div>
             <div class="kpi-footer">
-              <span>Google Apps Script Endpoint</span>
+              <span>คงเลข 0 นำหน้า 100%</span>
             </div>
           </div>
 
-          <!-- Card 4: Database Connection Status -->
+          <!-- Card 4: Editable Profile Feature -->
           <div class="kpi-card">
             <div class="kpi-top">
-              <span class="kpi-label">สถานะชีต (Google Sheet)</span>
+              <span class="kpi-label">ระบบแก้ไขข้อมูลส่วนตัว</span>
               <div class="kpi-icon-box kpi-icon-amber">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
               </div>
             </div>
-            <div class="kpi-value" style="font-size: 1.75rem; color: var(--text-main);" id="sheetStatusText">ออนไลน์ ⚡</div>
+            <div class="kpi-value" style="font-size: 1.8rem;">เปิดใช้งาน ⚡</div>
             <div class="kpi-footer">
-              <span>แท็บ: Sheet1 (พร้อมรับข้อมูล)</span>
+              <span>แก้ไขได้ตลอดเวลา</span>
             </div>
           </div>
         </div>
 
-        <!-- Middle Row: Goal Meter & System Insights -->
+        <!-- Middle Row: Goal Meter & Storage Details -->
         <div class="dashboard-mid-grid">
-          <!-- Left: Goal & Quota Progress -->
+          <!-- Left: Registration Target -->
           <div class="content-card">
             <div class="card-head">
               <div class="card-head-title">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                ความคืบหน้าเป้าหมายการรับลงทะเบียน
+                ความคืบหน้าเป้าหมายสมาชิก
               </div>
               <span style="font-size: 0.85rem; color: var(--text-muted);" id="goalTargetText">เป้าหมาย: 100 คน</span>
             </div>
@@ -940,49 +1007,49 @@
             </div>
 
             <p style="font-size: 0.875rem; color: var(--text-muted); line-height: 1.6;">
-              💡 <strong>ข้อแนะนำ:</strong> ระบบนี้บันทึกข้อมูลแบบ Non-blocking เข้าสู่ Google Sheets ทันที เมื่อมีคนกรอกข้อมูลผ่านฟอร์ม ยอดรวมจะอัปเดตและแสดงผลให้ทุกคนเห็นพร้อมกัน
+              💡 <strong>ระบบจัดการรูปโปรไฟล์:</strong> เมื่อสมาชิกอัปโหลดรูปภาพ ระบบจะส่งไฟล์เข้าโฟลเดอร์ Google Drive แบบอัตโนมัติ และบันทึกลิงก์รูปภาพลงใน Google Sheets
             </p>
           </div>
 
-          <!-- Right: System Insights & Features -->
+          <!-- Right: Drive & Feature Badges -->
           <div class="content-card">
             <div class="card-head">
               <div class="card-head-title">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                คุณสมบัติและมาตรการข้อมูล
+                Google Drive Folder Integration
               </div>
             </div>
 
             <ul class="insights-list">
               <li class="insight-item">
-                <span>รักษาเลข 0 เบอร์โทรศัพท์ (Text Prefix)</span>
-                <span class="insight-tag">Active</span>
+                <span>Google Drive Folder ID</span>
+                <span class="insight-tag">1hRl3JLjIxzFtdbbQMcSAuTdwHawZ2cBB</span>
               </li>
               <li class="insight-item">
-                <span>บันทึก Timestamp วัน-เวลา อัตโนมัติ</span>
-                <span class="insight-tag">Auto</span>
+                <span>อัปโหลดรูปโปรไฟล์อัตโนมัติ</span>
+                <span class="insight-tag">Base64 Decode</span>
               </li>
               <li class="insight-item">
-                <span>รองรับ doGet สำหรับดึงข้อมูลสรุป</span>
-                <span class="insight-tag">GET Ready</span>
+                <span>แก้ไขข้อมูลโปรไฟล์ตัวเอง</span>
+                <span class="insight-tag">Update Action</span>
               </li>
               <li class="insight-item">
-                <span>รองรับ doPost สำหรับเพิ่มข้อมูลใหม่</span>
-                <span class="insight-tag">POST Ready</span>
+                <span>รักษาเลข 0 นำหน้าเบอร์โทร</span>
+                <span class="insight-tag">Text Format</span>
               </li>
             </ul>
           </div>
         </div>
 
-        <!-- Bottom Table: Recent Submissions Log -->
+        <!-- Bottom Table: Member Profiles Table -->
         <div class="content-card">
           <div class="card-head">
             <div class="card-head-title">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-              รายการลงทะเบียนล่าสุดในระบบ
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+              รายชื่อสมาชิกและโปรไฟล์ (คลิก "✏️ แก้ไข" เพื่อปรับปรุงข้อมูล)
             </div>
-            <button class="btn btn-secondary" style="padding: 0.4rem 0.85rem; font-size: 0.8rem;" onclick="openRegistrationModal()">
-              + เพิ่มข้อมูล
+            <button class="btn btn-primary" style="padding: 0.45rem 1rem; font-size: 0.85rem;" onclick="openRegistrationModal('register')">
+              + ลงทะเบียนใหม่
             </button>
           </div>
 
@@ -1001,10 +1068,11 @@
               <thead>
                 <tr>
                   <th>#</th>
-                  <th>ผู้ลงทะเบียน</th>
+                  <th>โปรไฟล์ & ชื่อสมาชิก</th>
                   <th>อีเมล</th>
                   <th>เบอร์โทรศัพท์</th>
-                  <th>สถานะ</th>
+                  <th>วันที่ลงทะเบียน</th>
+                  <th style="text-align: center;">จัดการ</th>
                 </tr>
               </thead>
               <tbody id="tableBody">
@@ -1020,23 +1088,48 @@
     <!-- Footer -->
     <footer class="dash-footer">
       <div class="container">
-        © 2026 Executive Registration Dashboard &bull; Google Apps Script Integration
+        © 2026 Executive Registration & Profile Portal &bull; Google Drive & Sheets Integration
       </div>
     </footer>
   </div>
 
   <!-- ==========================================
-       Registration Modal Form
+       Registration & Edit Profile Modal
        ========================================== -->
   <div class="modal-backdrop" id="regModal">
     <div class="modal-card">
       <div class="modal-header">
-        <h3 style="font-size: 1.15rem; font-weight: 700;">ลงทะเบียนข้อมูลใหม่</h3>
+        <h3 id="modalTitle" style="font-size: 1.15rem; font-weight: 700;">ลงทะเบียนสมาชิกใหม่</h3>
         <button class="modal-close" onclick="closeRegistrationModal()">&times;</button>
       </div>
 
       <div class="modal-body">
         <form id="modalForm" novalidate>
+          <input type="hidden" id="formAction" value="register">
+          <input type="hidden" id="oldEmail" value="">
+          <input type="hidden" id="existingPhotoUrl" value="">
+
+          <!-- Profile Photo Upload Box -->
+          <div class="photo-upload-container">
+            <label class="form-label" style="margin-bottom: 0.5rem;">รูปภาพประจำตัว (อัปโหลดเข้า Google Drive)</label>
+            <div class="photo-preview-box" id="photoPreviewBox" onclick="triggerFileInput()" title="คลิกเพื่อเลือกรูปภาพ">
+              <img id="photoPreviewImg" class="photo-preview-img" alt="Profile Preview">
+              <div class="photo-icon-placeholder" id="photoPlaceholder">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                <span>เลือกรูป</span>
+              </div>
+              <div class="photo-overlay">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                <span>เปลี่ยนรูป</span>
+              </div>
+            </div>
+            <input type="file" id="profileFileInput" accept="image/*" style="display: none;" onchange="handleFileSelect(event)">
+            
+            <div class="photo-actions" id="photoActionBtns" style="display: none;">
+              <button type="button" class="btn-photo-action" onclick="removeSelectedPhoto()">ลบรูปภาพ</button>
+            </div>
+          </div>
+
           <div class="form-group">
             <label class="form-label" for="nameInput">ชื่อ - นามสกุล *</label>
             <div class="input-wrapper">
@@ -1065,7 +1158,7 @@
               </span>
               <input type="tel" id="phoneInput" class="form-control" placeholder="เช่น 0812345678" maxlength="12" required>
             </div>
-            <p style="font-size: 0.775rem; color: var(--text-muted); margin-top: 0.35rem;">✓ ระบบใส่เครื่องหมายรักษาเลข 0 นำหน้าลง Google Sheets ให้อัตโนมัติ</p>
+            <p style="font-size: 0.775rem; color: var(--text-muted); margin-top: 0.35rem;">✓ ระบบบันทึกเลข 0 นำหน้า และอัปโหลดภาพเข้า Google Drive</p>
           </div>
 
           <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
@@ -1116,27 +1209,106 @@
       setTheme(nextTheme);
     });
 
-    // Mock/Recent submissions storage in LocalStorage
-    let localSubmissions = JSON.parse(localStorage.getItem('dash_submissions') || '[]');
+    // Local Records Cache
+    let recordsList = JSON.parse(localStorage.getItem('dash_records') || '[]');
 
-    // Seed default sample data if empty
-    if (localSubmissions.length === 0) {
-      localSubmissions = [
-        { name: "คุณสมชาย ใจดี", email: "somchai@gmail.com", phone: "0812345678", date: "วันนี้ 09:30" },
-        { name: "คุณกิตติศักดิ์ รัตนชัย", email: "kittisak@company.co.th", phone: "0897654321", date: "วันนี้ 10:15" },
-        { name: "คุณวิภาวรรณ ทรัพย์เจริญ", email: "wipawan.t@gmail.com", phone: "0623456789", date: "วันนี้ 11:40" }
-      ];
-      localStorage.setItem('dash_submissions', JSON.stringify(localSubmissions));
+    // Image Upload State
+    let selectedImageBase64 = "";
+    let selectedImageMime = "image/jpeg";
+
+    function triggerFileInput() {
+      document.getElementById('profileFileInput').click();
     }
 
-    // Modal Control
+    function handleFileSelect(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      if (!file.type.startsWith('image/')) {
+        showToast('กรุณาเลือกไฟล์รูปภาพเท่านั้น', 'error');
+        return;
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        showToast('ขนาดไฟล์รูปภาพต้องไม่เกิน 5 MB', 'error');
+        return;
+      }
+
+      selectedImageMime = file.type;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        selectedImageBase64 = evt.target.result;
+        displayPreviewPhoto(selectedImageBase64);
+        document.getElementById('photoActionBtns').style.display = 'flex';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function displayPreviewPhoto(src) {
+      const img = document.getElementById('photoPreviewImg');
+      const placeholder = document.getElementById('photoPlaceholder');
+      if (src) {
+        img.src = src;
+        img.style.display = 'block';
+        placeholder.style.display = 'none';
+      } else {
+        img.src = '';
+        img.style.display = 'none';
+        placeholder.style.display = 'flex';
+      }
+    }
+
+    function removeSelectedPhoto() {
+      selectedImageBase64 = "";
+      document.getElementById('existingPhotoUrl').value = "";
+      document.getElementById('profileFileInput').value = "";
+      displayPreviewPhoto("");
+      document.getElementById('photoActionBtns').style.display = 'none';
+    }
+
+    // Modal Controls
     const regModal = document.getElementById('regModal');
-    function openRegistrationModal() {
+    const modalTitle = document.getElementById('modalTitle');
+    const formAction = document.getElementById('formAction');
+    const oldEmailInput = document.getElementById('oldEmail');
+    const existingPhotoUrlInput = document.getElementById('existingPhotoUrl');
+
+    function openRegistrationModal(mode = 'register', recordData = null) {
+      formAction.value = mode;
+      selectedImageBase64 = "";
+      document.getElementById('profileFileInput').value = "";
+
+      if (mode === 'edit' && recordData) {
+        modalTitle.textContent = "✏️ แก้ไขข้อมูลโปรไฟล์สมาชิก";
+        document.getElementById('nameInput').value = recordData.name || "";
+        document.getElementById('emailInput').value = recordData.email || "";
+        document.getElementById('phoneInput').value = recordData.phone || "";
+        oldEmailInput.value = recordData.email || "";
+        existingPhotoUrlInput.value = recordData.photoUrl || "";
+
+        if (recordData.photoUrl) {
+          displayPreviewPhoto(recordData.photoUrl);
+          document.getElementById('photoActionBtns').style.display = 'flex';
+        } else {
+          displayPreviewPhoto("");
+          document.getElementById('photoActionBtns').style.display = 'none';
+        }
+      } else {
+        modalTitle.textContent = "ลงทะเบียนสมาชิกใหม่";
+        document.getElementById('modalForm').reset();
+        oldEmailInput.value = "";
+        existingPhotoUrlInput.value = "";
+        displayPreviewPhoto("");
+        document.getElementById('photoActionBtns').style.display = 'none';
+      }
+
       regModal.classList.add('active');
     }
+
     function closeRegistrationModal() {
       regModal.classList.remove('active');
     }
+
     regModal.addEventListener('click', (e) => {
       if (e.target === regModal) closeRegistrationModal();
     });
@@ -1156,13 +1328,13 @@
       }, 4000);
     }
 
-    // Render Table Rows
-    function renderTable(dataToRender = localSubmissions) {
+    // Render Table Rows with Profile Photos
+    function renderTable(dataToRender = recordsList) {
       const tableBody = document.getElementById('tableBody');
       const countLabel = document.getElementById('tableCountText');
 
-      if (dataToRender.length === 0) {
-        tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">ไม่พบข้อมูลที่ค้นหา</td></tr>`;
+      if (!dataToRender || dataToRender.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">ยังไม่มีข้อมูลสมาชิก หรือไม่พบข้อมูลที่ค้นหา</td></tr>`;
         countLabel.textContent = `0 รายการ`;
         return;
       }
@@ -1170,30 +1342,49 @@
       countLabel.textContent = `แสดง ${dataToRender.length} รายการ`;
       tableBody.innerHTML = dataToRender.map((item, index) => {
         const initial = item.name ? item.name.charAt(0) : '#';
+        const avatarHtml = item.photoUrl
+          ? `<img src="${item.photoUrl}" class="avatar-img" alt="${item.name}" onerror="this.onerror=null; this.parentElement.innerHTML='<span class=\\'avatar-fallback\\'>${initial}</span>';">`
+          : `<span class="avatar-fallback">${initial}</span>`;
+
         return `
           <tr>
             <td style="color: var(--text-muted); font-size: 0.8rem;">${index + 1}</td>
             <td>
-              <div style="display: flex; align-items: center;">
-                <span class="user-avatar">${initial}</span>
-                <strong style="font-weight: 600;">${item.name}</strong>
+              <div class="user-profile-cell">
+                <div class="avatar-wrapper">
+                  ${avatarHtml}
+                </div>
+                <div>
+                  <strong style="font-weight: 600; display: block;">${item.name}</strong>
+                  ${item.photoUrl ? '<span style="font-size: 0.72rem; color: var(--accent);">✓ มีรูปโปรไฟล์</span>' : ''}
+                </div>
               </div>
             </td>
             <td style="color: var(--text-muted);">${item.email}</td>
-            <td><span class="phone-badge">${item.phone}</span></td>
-            <td><span class="pill-success"><span style="width: 5px; height: 5px; background: currentColor; border-radius: 50%;"></span> สำเร็จ</span></td>
+            <td><span class="phone-badge">${item.phone || '-'}</span></td>
+            <td style="color: var(--text-muted); font-size: 0.85rem;">${item.date || 'ล่าสุด'}</td>
+            <td style="text-align: center;">
+              <button class="btn-edit" onclick='editMemberRow(${JSON.stringify(item)})'>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                แก้ไข
+              </button>
+            </td>
           </tr>
         `;
       }).join('');
     }
 
+    function editMemberRow(recordData) {
+      openRegistrationModal('edit', recordData);
+    }
+
     // Search Filter
     function filterTable() {
       const query = document.getElementById('tableSearchInput').value.toLowerCase().trim();
-      const filtered = localSubmissions.filter(item => 
-        item.name.toLowerCase().includes(query) ||
-        item.email.toLowerCase().includes(query) ||
-        item.phone.includes(query)
+      const filtered = recordsList.filter(item => 
+        (item.name && item.name.toLowerCase().includes(query)) ||
+        (item.email && item.email.toLowerCase().includes(query)) ||
+        (item.phone && item.phone.includes(query))
       );
       renderTable(filtered);
     }
@@ -1218,18 +1409,33 @@
       fetch(API_URL)
         .then(res => res.text())
         .then(text => {
-          // Extract number from response (e.g., "จำนวนคนที่ลงทะเบียนแล้ว: 15 คน" -> 15)
-          const numberMatch = text.match(/\d+/);
-          let totalCount = numberMatch ? parseInt(numberMatch[0]) : localSubmissions.length;
+          let totalCount = 0;
+          let parsedRecords = null;
 
-          // If count is zero, default to recorded local submissions length
-          if (totalCount === 0 && localSubmissions.length > 0) {
-            totalCount = localSubmissions.length;
+          try {
+            const json = JSON.parse(text);
+            if (json.status === "success") {
+              totalCount = json.total || 0;
+              if (Array.isArray(json.records)) {
+                parsedRecords = json.records;
+              }
+            }
+          } catch (e) {
+            // Fallback if plain text response
+            const numberMatch = text.match(/\d+/);
+            totalCount = numberMatch ? parseInt(numberMatch[0]) : recordsList.length;
+          }
+
+          if (parsedRecords && parsedRecords.length > 0) {
+            recordsList = parsedRecords;
+            localStorage.setItem('dash_records', JSON.stringify(recordsList));
+          } else if (totalCount === 0 && recordsList.length > 0) {
+            totalCount = recordsList.length;
           }
 
           kpiTotal.textContent = totalCount.toLocaleString();
 
-          // Calculate Goal Progress (Target: 100)
+          // Goal Progress
           const target = 100;
           const percent = Math.min(Math.round((totalCount / target) * 100), 100);
           goalProgressFill.style.width = `${percent}%`;
@@ -1240,19 +1446,21 @@
           const timeStr = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
           lastUpdatedText.textContent = `อัปเดตล่าสุด: ${timeStr} น.`;
 
-          showToast(`ซิงค์ข้อมูลสำเร็จ: ${text}`, 'success');
+          renderTable();
+          showToast(`ซิงค์ข้อมูลสำเร็จ (${totalCount} รายการ)`, 'success');
         })
         .catch(err => {
-          kpiTotal.textContent = localSubmissions.length;
-          lastUpdatedText.textContent = `อัปเดตข้อมูลออฟไลน์`;
-          showToast(`ไม่สามารถติดต่อเซิร์ฟเวอร์: ${err}`, 'error');
+          kpiTotal.textContent = recordsList.length;
+          lastUpdatedText.textContent = `ออฟไลน์โหมด`;
+          renderTable();
+          showToast(`ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์: ${err}`, 'error');
         })
         .finally(() => {
           refreshIcon.style.animation = '';
         });
     }
 
-    // Submit New Registration (doPost)
+    // Submit New Registration or Edit Profile (doPost)
     const modalForm = document.getElementById('modalForm');
     const submitBtn = document.getElementById('submitBtn');
     const submitText = document.getElementById('submitText');
@@ -1264,6 +1472,9 @@
       const nameVal = document.getElementById('nameInput').value.trim();
       const emailVal = document.getElementById('emailInput').value.trim();
       let phoneVal = phoneInput.value.trim();
+      const action = formAction.value;
+      const oldEmail = oldEmailInput.value;
+      const existingPhoto = existingPhotoUrlInput.value;
 
       if (!nameVal || !emailVal || !phoneVal) {
         showToast('กรุณากรอกข้อมูลให้ครบทุกช่อง', 'error');
@@ -1271,16 +1482,24 @@
       }
 
       submitBtn.disabled = true;
-      submitText.textContent = 'กำลังบันทึก...';
+      submitText.textContent = selectedImageBase64 ? 'กำลังอัปโหลดรูปเข้า Drive...' : 'กำลังบันทึกข้อมูล...';
       submitIcon.innerHTML = `<div class="spinner"></div>`;
 
-      // รักษาเลข 0 นำหน้าเบอร์โทรศัพท์ด้วย Single Quote (')
+      // รักษาเลข 0 นำหน้าเบอร์โทรศัพท์
       const formattedPhone = phoneVal.startsWith("'") ? phoneVal : ("'" + phoneVal);
 
       const data = new FormData();
+      data.append('action', action);
       data.append('name', nameVal);
       data.append('email', emailVal);
       data.append('phone', formattedPhone);
+      data.append('oldEmail', oldEmail);
+      data.append('photoUrl', existingPhoto);
+
+      if (selectedImageBase64) {
+        data.append('imageBase64', selectedImageBase64);
+        data.append('imageMime', selectedImageMime);
+      }
 
       fetch(API_URL, {
         method: 'POST',
@@ -1288,24 +1507,51 @@
       })
         .then(res => res.text())
         .then(text => {
-          showToast(text || 'ลงทะเบียนสำเร็จเรียบร้อยแล้ว!', 'success');
+          let responseMsg = "ดำเนินการสำเร็จเรียบร้อยแล้ว";
+          let returnedPhoto = selectedImageBase64 || existingPhoto;
 
-          // บันทึกลงตาราง Local Feed
-          localSubmissions.unshift({
-            name: nameVal,
-            email: emailVal,
-            phone: phoneVal,
-            date: "เพิ่งลงทะเบียน"
-          });
-          localStorage.setItem('dash_submissions', JSON.stringify(localSubmissions));
+          try {
+            const json = JSON.parse(text);
+            if (json.message) responseMsg = json.message;
+            if (json.photoUrl) returnedPhoto = json.photoUrl;
+          } catch(e) {
+            responseMsg = text || responseMsg;
+          }
 
+          showToast(responseMsg, 'success');
+
+          // อัปเดตข้อมูล Local Cache
+          const nowStr = new Date().toLocaleDateString('th-TH') + " " + new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+          if (action === 'edit') {
+            const index = recordsList.findIndex(r => r.email.toLowerCase() === oldEmail.toLowerCase());
+            if (index !== -1) {
+              recordsList[index] = {
+                ...recordsList[index],
+                name: nameVal,
+                email: emailVal,
+                phone: phoneVal,
+                photoUrl: returnedPhoto,
+                date: nowStr
+              };
+            }
+          } else {
+            recordsList.unshift({
+              name: nameVal,
+              email: emailVal,
+              phone: phoneVal,
+              photoUrl: returnedPhoto,
+              date: nowStr
+            });
+          }
+
+          localStorage.setItem('dash_records', JSON.stringify(recordsList));
           modalForm.reset();
           closeRegistrationModal();
           renderTable();
           fetchDashboardData();
         })
         .catch(err => {
-          showToast('เกิดข้อผิดพลาดในการส่งข้อมูล: ' + err, 'error');
+          showToast('เกิดข้อผิดพลาดในการบันทึก: ' + err, 'error');
         })
         .finally(() => {
           submitBtn.disabled = false;
@@ -1314,7 +1560,7 @@
         });
     });
 
-    // Initialize on Load
+    // Initial Load
     renderTable();
     fetchDashboardData();
   </script>
