@@ -1,6 +1,6 @@
 // ==========================================================================
 // Code.gs - Google Apps Script Backend (Web App)
-// รองรับ: บันทึกรูปลง Google Drive และแปลงลิงก์เป็น https://lh5.googleusercontent.com/d/
+// รองรับ: ขอสิทธิ์ DriveApp, บันทึกรูปลง Drive, แปลงเป็น LH5, แก้ไขข้อมูล, และส่ง JSON
 // ==========================================================================
 
 // 1) กำหนด ID โฟลเดอร์ Google Drive สำหรับจัดเก็บรูปภาพ
@@ -9,6 +9,51 @@ const FOLDER_ID = "1hRl3JLjIxzFtdbbQMcSAuTdwHawZ2cBB";
 // 2) กำหนดชีตที่ใช้บันทึกข้อมูล (ชื่อแท็บใน Google Sheets)
 const SHEET_NAME = "Sheet1";
 
+// ==========================================================================
+// 🔑 ฟังก์ชันสำหรับขอสิทธิ์เข้าถึง Google Drive & Sheets (กด Run ครั้งแรกใน Script Editor)
+// ==========================================================================
+/**
+ * วิธีใช้: ในหน้า Apps Script Editor ให้เลือกฟังก์ชัน "authorizeDriveAccess"
+ * ในแถบเมนูด้านบน แล้วกดปุ่ม ▶️ "เรียกใช้" (Run) เพื่ออนุญาตสิทธิ์เข้าถึง Google Drive
+ */
+function authorizeDriveAccess() {
+  try {
+    Logger.log("=== เริ่มต้นตรวจสอบและขอสิทธิ์เข้าถึง Google Drive & Sheets ===");
+
+    // 1. ตรวจสอบและขอสิทธิ์ Google Sheets
+    const sheet = getSheet();
+    Logger.log("✓ 1/3 สิทธิ์ Google Sheets ผ่าน: " + sheet.getName());
+
+    // 2. ตรวจสอบและขอสิทธิ์เข้าถึงโฟลเดอร์ Google Drive
+    const folder = DriveApp.getFolderById(FOLDER_ID);
+    Logger.log("✓ 2/3 สิทธิ์ Google Drive ผ่าน: โฟลเดอร์ชื่อ '" + folder.getName() + "' (ID: " + FOLDER_ID + ")");
+
+    // 3. ทดสอบสร้างและลบไฟล์จำลองเพื่อยืนยันสิทธิ์สร้างไฟล์รูปภาพ
+    const testBlob = Utilities.newBlob("DriveApp Authorization Test OK", "text/plain", "test_auth.txt");
+    const testFile = folder.createFile(testBlob);
+    testFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    
+    const fileId = testFile.getId();
+    const testLh5Url = "https://lh5.googleusercontent.com/d/" + fileId;
+    Logger.log("✓ 3/3 ทดสอบสร้างไฟล์และสร้างลิงก์ LH5 สำเร็จ: " + testLh5Url);
+
+    // ลบไฟล์ทดสอบทิ้ง
+    testFile.setTrashed(true);
+
+    Logger.log("==========================================================");
+    Logger.log("🎉 การขอสิทธิ์และตั้งค่า Google Drive สำเร็จสมบูรณ์ 100%!");
+    Logger.log("==========================================================");
+
+    return "ขอสิทธิ์เข้าถึง Google Drive สำเร็จสมบูรณ์ พร้อมใช้งานแล้ว";
+  } catch (error) {
+    Logger.log("❌ เกิดข้อผิดพลาดในการขอสิทธิ์: " + error.toString());
+    return "เกิดข้อผิดพลาด: " + error.toString();
+  }
+}
+
+// --------------------------------------------------------------------------
+// ดึง Object แผ่นงาน Google Sheets
+// --------------------------------------------------------------------------
 function getSheet() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   let sheet = ss.getSheetByName(SHEET_NAME);
