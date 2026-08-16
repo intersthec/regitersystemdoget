@@ -1,6 +1,6 @@
 // ==========================================================================
 // Code.gs - Google Apps Script Backend (Web App)
-// รองรับ: ลงทะเบียนใหม่, อัปโหลดรูปโปรไฟล์เข้า Google Drive, แก้ไขข้อมูล, และส่งข้อมูล JSON
+// รองรับ: บันทึกรูปลง Google Drive และแปลงลิงก์เป็น https://lh5.googleusercontent.com/d/
 // ==========================================================================
 
 // 1) กำหนด ID โฟลเดอร์ Google Drive สำหรับจัดเก็บรูปภาพ
@@ -25,7 +25,19 @@ function getSheet() {
 }
 
 // --------------------------------------------------------------------------
-// บันทึกรูปภาพลง Google Drive และรับลิงก์ URL
+// ฟังก์ชันแปลง File ID หรือ Drive URL ให้เป็นลิงก์ lh5.googleusercontent.com
+// --------------------------------------------------------------------------
+function convertToLh5Url(fileIdOrUrl) {
+  if (!fileIdOrUrl) return "";
+  const match = fileIdOrUrl.toString().match(/[-\w]{25,}/);
+  if (match) {
+    return "https://lh5.googleusercontent.com/d/" + match[0];
+  }
+  return fileIdOrUrl;
+}
+
+// --------------------------------------------------------------------------
+// บันทึกรูปภาพลง Google Drive และรับลิงก์ URL ในรูปแบบ LH5
 // --------------------------------------------------------------------------
 function saveImageToDrive(base64Data, fileName, mimeType) {
   try {
@@ -55,11 +67,14 @@ function saveImageToDrive(base64Data, fileName, mimeType) {
     const blob = Utilities.newBlob(decodedBytes, actualMime, finalFileName);
     const file = folder.createFile(blob);
     
-    // ตั้งค่าสิทธิ์ให้ทุกคนที่มีลิงก์สามารถดูรูปภาพได้
+    // ตั้งค่าสิทธิ์ให้ทุกคนที่มีลิงก์สามารถดูรูปภาพได้ (Public View)
     file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
     
-    // ส่งกลับลิงก์แสดงผลรูปภาพความเร็วสูง
-    return "https://lh3.googleusercontent.com/d/" + file.getId();
+    // ----------------------------------------------------------------------
+    // ส่งกลับลิงก์รูปภาพในรูปแบบ https://lh5.googleusercontent.com/d/{FILE_ID}
+    // ----------------------------------------------------------------------
+    const fileId = file.getId();
+    return "https://lh5.googleusercontent.com/d/" + fileId;
   } catch (err) {
     Logger.log("Error saving to Drive: " + err.toString());
     return "";
@@ -88,8 +103,8 @@ function doPost(e) {
       phoneFormatted = "'" + phoneFormatted;
     }
     
-    // จัดการอัปโหลดรูปภาพถ้ามีส่งมา
-    let photoUrl = data.photoUrl || "";
+    // จัดการอัปโหลดรูปภาพ และแปลงเป็นลิงก์ lh5
+    let photoUrl = data.photoUrl ? convertToLh5Url(data.photoUrl) : "";
     if (imageBase64 && imageBase64.length > 50) {
       const uploadedUrl = saveImageToDrive(imageBase64, "profile_" + email.replace(/[^a-zA-Z0-9]/g, "_"), imageMime);
       if (uploadedUrl) {
@@ -103,17 +118,16 @@ function doPost(e) {
     if (action === "update") {
       let rowIndexToUpdate = -1;
       
-      // ค้นหาแถวด้วย oldEmail หรือ email
       for (let i = 1; i < allData.length; i++) {
         const rowEmail = allData[i][2] ? allData[i][2].toString().trim() : "";
         if (rowEmail.toLowerCase() === oldEmail.toLowerCase() || rowEmail.toLowerCase() === email.toLowerCase()) {
-          rowIndexToUpdate = i + 1; // 1-indexed for Sheet
+          rowIndexToUpdate = i + 1;
           break;
         }
       }
       
       if (rowIndexToUpdate > 0) {
-        const existingPhoto = allData[rowIndexToUpdate - 1][4] || "";
+        const existingPhoto = allData[rowIndexToUpdate - 1][4] ? convertToLh5Url(allData[rowIndexToUpdate - 1][4]) : "";
         const finalPhoto = photoUrl || existingPhoto;
         
         sheet.getRange(rowIndexToUpdate, 1, 1, 5).setValues([[
@@ -126,7 +140,7 @@ function doPost(e) {
         
         return ContentService.createTextOutput(JSON.stringify({
           status: "success",
-          message: "แก้ไขข้อมูลและบันทึกรูปโปรไฟล์เรียบร้อยแล้ว",
+          message: "แก้ไขข้อมูลและบันทึกรูปโปรไฟล์ (lh5) เรียบร้อยแล้ว",
           photoUrl: finalPhoto
         })).setMimeType(ContentService.MimeType.JSON);
       }
@@ -143,7 +157,7 @@ function doPost(e) {
     
     return ContentService.createTextOutput(JSON.stringify({
       status: "success",
-      message: "ลงทะเบียนและบันทึกรูปโปรไฟล์สำเร็จเรียบร้อยแล้ว",
+      message: "ลงทะเบียนและบันทึกรูปโปรไฟล์ (lh5) สำเร็จเรียบร้อยแล้ว",
       photoUrl: photoUrl
     })).setMimeType(ContentService.MimeType.JSON);
     
@@ -171,12 +185,13 @@ function doGet(e) {
       })).setMimeType(ContentService.MimeType.JSON);
     }
     
-    const rows = allData.slice(1); // ตัดหัวตารางออก
+    const rows = allData.slice(1);
     const total = rows.length;
     
     const records = rows.map((r, i) => {
       const rawPhone = r[3] ? r[3].toString() : "";
       const cleanPhone = rawPhone.replace(/^'/, "");
+      const lh5PhotoUrl = r[4] ? convertToLh5Url(r[4].toString()) : "";
       
       let formattedDate = "";
       if (r[0] instanceof Date) {
@@ -191,9 +206,9 @@ function doGet(e) {
         name: r[1] ? r[1].toString() : "",
         email: r[2] ? r[2].toString() : "",
         phone: cleanPhone,
-        photoUrl: r[4] ? r[4].toString() : ""
+        photoUrl: lh5PhotoUrl
       };
-    }).reverse(); // เอาคนล่าสุดขึ้นก่อน
+    }).reverse();
     
     const result = {
       status: "success",

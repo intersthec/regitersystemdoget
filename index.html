@@ -1328,6 +1328,17 @@
       }, 4000);
     }
 
+    // แปลงลิงก์รูปภาพให้เป็นรูปแบบ LH5 (Google CDN)
+    function convertToLh5Url(url) {
+      if (!url) return "";
+      if (url.startsWith("data:")) return url; // Base64 preview
+      const match = url.toString().match(/[-\w]{25,}/);
+      if (match) {
+        return `https://lh5.googleusercontent.com/d/${match[0]}`;
+      }
+      return url;
+    }
+
     // Render Table Rows with Profile Photos
     function renderTable(dataToRender = recordsList) {
       const tableBody = document.getElementById('tableBody');
@@ -1342,8 +1353,9 @@
       countLabel.textContent = `แสดง ${dataToRender.length} รายการ`;
       tableBody.innerHTML = dataToRender.map((item, index) => {
         const initial = item.name ? item.name.charAt(0) : '#';
-        const avatarHtml = item.photoUrl
-          ? `<img src="${item.photoUrl}" class="avatar-img" alt="${item.name}" onerror="this.onerror=null; this.parentElement.innerHTML='<span class=\\'avatar-fallback\\'>${initial}</span>';">`
+        const lh5Url = item.photoUrl ? convertToLh5Url(item.photoUrl) : "";
+        const avatarHtml = lh5Url
+          ? `<img src="${lh5Url}" class="avatar-img" alt="${item.name}" onerror="this.onerror=null; this.parentElement.innerHTML='<span class=\\'avatar-fallback\\'>${initial}</span>';">`
           : `<span class="avatar-fallback">${initial}</span>`;
 
         return `
