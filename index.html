@@ -1215,6 +1215,7 @@
     // Image Upload State
     let selectedImageBase64 = "";
     let selectedImageMime = "image/jpeg";
+    let isPhotoRemoved = false;
 
     function triggerFileInput() {
       document.getElementById('profileFileInput').click();
@@ -1267,6 +1268,7 @@
 
       showToast('กำลังเตรียมรูปภาพ...', 'info');
       try {
+        isPhotoRemoved = false;
         // บีบอัดภาพให้อัตโนมัติ (ขนาดประมาณ 30-70 KB ส่งเร็วมาก)
         selectedImageBase64 = await compressImageFile(file);
         selectedImageMime = "image/jpeg";
@@ -1295,10 +1297,12 @@
 
     function removeSelectedPhoto() {
       selectedImageBase64 = "";
+      isPhotoRemoved = true;
       document.getElementById('existingPhotoUrl').value = "";
       document.getElementById('profileFileInput').value = "";
       displayPreviewPhoto("");
       document.getElementById('photoActionBtns').style.display = 'none';
+      showToast('ลบรูปภาพแล้ว (ระบบจะลบไฟล์ออกจาก Google Drive เมื่อกดบันทึก)', 'info');
     }
 
     // Modal Controls
@@ -1311,6 +1315,7 @@
     function openRegistrationModal(mode = 'register', recordData = null) {
       formAction.value = mode;
       selectedImageBase64 = "";
+      isPhotoRemoved = false;
       document.getElementById('profileFileInput').value = "";
 
       if (mode === 'edit' && recordData) {
@@ -1541,7 +1546,8 @@
       payload.append('email', emailVal);
       payload.append('phone', formattedPhone);
       payload.append('oldEmail', oldEmail);
-      payload.append('photoUrl', existingPhoto);
+      payload.append('photoUrl', isPhotoRemoved ? '' : existingPhoto);
+      payload.append('removePhoto', isPhotoRemoved ? 'true' : 'false');
 
       if (selectedImageBase64) {
         payload.append('imageBase64', selectedImageBase64);

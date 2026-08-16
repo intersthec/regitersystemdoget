@@ -1,6 +1,6 @@
 // ==========================================================================
 // Code.gs - Google Apps Script Backend (Web App)
-// รองรับ: บันทึกรูปลง Drive (LH5), แก้ไขข้อมูล, ป้องกันเลข 0 หาย, และส่ง JSON
+// รองรับ: บันทึกรูปลง Drive, ลบรูปเดิมอัตโนมัติเมื่อแก้ไข/เปลี่ยนรูป, ป้องกันเลข 0 หาย
 // ==========================================================================
 
 // 1) กำหนด ID โฟลเดอร์ Google Drive สำหรับจัดเก็บรูปภาพ
@@ -10,21 +10,18 @@ const FOLDER_ID = "1hRl3JLjIxzFtdbbQMcSAuTdwHawZ2cBB";
 const SHEET_NAME = "Sheet1";
 
 // ==========================================================================
-// 🚨 ฟังก์ชันบังคับขอสิทธิ์สร้างไฟล์ Google Drive (createFile)
+// 🚨 ฟังก์ชันบังคับขอสิทธิ์สร้างและลบไฟล์ Google Drive (createFile & trash)
 // ==========================================================================
 function grantPermission() {
-  // 1. เข้าถึงโฟลเดอร์ Google Drive
   var folder = DriveApp.getFolderById(FOLDER_ID);
   
-  // 2. บังคับเรียก createFile เพื่อให้ Google ร้องขอสิทธิ์ https://www.googleapis.com/auth/drive
+  // บังคับเรียกสร้างและลบไฟล์เพื่อให้ Google ร้องขอสิทธิ์ https://www.googleapis.com/auth/drive
   var testBlob = Utilities.newBlob("Drive Permission OK", "text/plain", "auth_test.txt");
   var testFile = folder.createFile(testBlob);
   testFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-  
-  // 3. ลบไฟล์ทดสอบ
   testFile.setTrashed(true);
   
-  Logger.log("✅ สิทธิ์สร้างไฟล์ Google Drive (createFile) ผ่านสมบูรณ์แล้ว: " + folder.getName());
+  Logger.log("✅ สิทธิ์ Google Drive ผ่านสมบูรณ์แล้ว: " + folder.getName());
 }
 
 // --------------------------------------------------------------------------
@@ -58,22 +55,39 @@ function convertToLh5Url(fileIdOrUrl) {
 }
 
 // --------------------------------------------------------------------------
+// 🗑️ ฟังก์ชันลบรูปภาพเดิมออกจาก Google Drive (ย้ายลงถังขยะ)
+// --------------------------------------------------------------------------
+function deleteFileFromDrive(photoUrlOrFileId) {
+  try {
+    if (!photoUrlOrFileId) return false;
+    const match = photoUrlOrFileId.toString().match(/[-\w]{25,}/);
+    if (match) {
+      const fileId = match[0];
+      const file = DriveApp.getFileById(fileId);
+      file.setTrashed(true); // ย้ายลงถังขยะ Google Drive
+      Logger.log("✓ ลบไฟล์รูปเดิมออกจาก Google Drive สำเร็จ: " + fileId);
+      return true;
+    }
+  } catch (err) {
+    Logger.log("⚠️ ไม่สามารถลบไฟล์เก่าจาก Drive ได้: " + err.toString());
+  }
+  return false;
+}
+
+// --------------------------------------------------------------------------
 // บันทึกรูปภาพลง Google Drive และรับลิงก์ URL ในรูปแบบ LH5
 // --------------------------------------------------------------------------
 function saveImageToDrive(base64Data, fileName, mimeType) {
   try {
     if (!base64Data || base64Data.length < 20) return "";
     
-    // พยายามเข้าถึงโฟลเดอร์ที่ระบุ หากไม่พบให้ใช้ Root Folder สำรอง
     let folder;
     try {
       folder = DriveApp.getFolderById(FOLDER_ID);
     } catch (e) {
-      Logger.log("ไม่พบโฟลเดอร์ตาม ID ใช้ Root Folder แทน: " + e.toString());
       folder = DriveApp.getRootFolder();
     }
     
-    // ตัด header ของ base64 ออกถ้ามี (เช่น data:image/jpeg;base64,...)
     let cleanBase64 = base64Data;
     let actualMime = mimeType || "image/jpeg";
     
@@ -88,7 +102,6 @@ function saveImageToDrive(base64Data, fileName, mimeType) {
       }
     }
     
-    // ลบช่องว่างและอักขระพิเศษออกจาก Base64
     cleanBase64 = cleanBase64.replace(/[\s\r\n]+/g, "");
     
     const decodedBytes = Utilities.base64Decode(cleanBase64);
@@ -98,14 +111,12 @@ function saveImageToDrive(base64Data, fileName, mimeType) {
     const blob = Utilities.newBlob(decodedBytes, actualMime, finalFileName);
     const file = folder.createFile(blob);
     
-    // ตั้งค่าสิทธิ์ให้อ่านได้สาธารณะ
     try {
       file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
     } catch (shareErr) {
       Logger.log("Sharing notice: " + shareErr.toString());
     }
     
-    // ส่งกลับลิงก์รูปภาพในรูปแบบ https://lh5.googleusercontent.com/d/{FILE_ID}
     const fileId = file.getId();
     const lh5Url = "https://lh5.googleusercontent.com/d/" + fileId;
     Logger.log("✓ บันทึกรูปลง Drive สำเร็จ: " + lh5Url);
@@ -131,6 +142,7 @@ function doPost(e) {
     let phone = data.phone ? data.phone.trim() : "";
     const imageBase64 = data.imageBase64 || "";
     const imageMime = data.imageMime || "image/jpeg";
+    const removePhoto = (data.removePhoto === "true" || data.removePhoto === true);
     
     // รักษาเลข 0 นำหน้าเบอร์โทรศัพท์
     let phoneFormatted = phone;
@@ -138,26 +150,12 @@ function doPost(e) {
       phoneFormatted = "'" + phoneFormatted;
     }
     
-    // จัดการอัปโหลดรูปภาพ และแปลงเป็นลิงก์ lh5
-    let photoUrl = data.photoUrl ? convertToLh5Url(data.photoUrl) : "";
-    let uploadLog = "";
-    
-    if (imageBase64 && imageBase64.length > 50) {
-      try {
-        const uploadedUrl = saveImageToDrive(imageBase64, "profile_" + email.replace(/[^a-zA-Z0-9]/g, "_"), imageMime);
-        if (uploadedUrl) {
-          photoUrl = uploadedUrl;
-          uploadLog = " (อัปโหลดรูปสำเร็จ)";
-        }
-      } catch (uploadErr) {
-        uploadLog = " (รูปอัปโหลดไม่สำเร็จ: " + uploadErr.message + ")";
-      }
-    }
-    
     const allData = sheet.getDataRange().getValues();
     
-    // กรณี: แก้ไขข้อมูลที่มีอยู่แล้ว (Update)
-    if (action === "update") {
+    // ========================================================================
+    // กรณีที่ 1: แก้ไขข้อมูลสมาชิกเดิม (Update)
+    // ========================================================================
+    if (action === "update" || action === "edit") {
       let rowIndexToUpdate = -1;
       
       for (let i = 1; i < allData.length; i++) {
@@ -169,9 +167,33 @@ function doPost(e) {
       }
       
       if (rowIndexToUpdate > 0) {
-        const existingPhoto = allData[rowIndexToUpdate - 1][4] ? convertToLh5Url(allData[rowIndexToUpdate - 1][4]) : "";
-        const finalPhoto = photoUrl || existingPhoto;
+        const existingPhoto = allData[rowIndexToUpdate - 1][4] ? allData[rowIndexToUpdate - 1][4].toString().trim() : "";
+        let finalPhoto = existingPhoto;
+        let updateNotice = "";
         
+        // 1.1 ถ้าผู้ใช้อัปโหลดรูปใหม่มาแทนที่
+        if (imageBase64 && imageBase64.length > 50) {
+          // ลบรูปเดิมออกจาก Google Drive ทันที
+          if (existingPhoto) {
+            deleteFileFromDrive(existingPhoto);
+          }
+          // บันทึกรูปใหม่เข้า Google Drive
+          const newPhotoUrl = saveImageToDrive(imageBase64, "profile_" + email.replace(/[^a-zA-Z0-9]/g, "_"), imageMime);
+          if (newPhotoUrl) {
+            finalPhoto = newPhotoUrl;
+            updateNotice = " (เปลี่ยนรูปโปรไฟล์ใหม่และลบรูปเก่าใน Drive แล้ว)";
+          }
+        } 
+        // 1.2 ถ้าผู้ใช้กดปุ่มลบรูปภาพ (ไม่ใส่รูป)
+        else if (removePhoto) {
+          if (existingPhoto) {
+            deleteFileFromDrive(existingPhoto);
+          }
+          finalPhoto = "";
+          updateNotice = " (ลบรูปโปรไฟล์ออกจาก Google Drive แล้ว)";
+        }
+        
+        // อัปเดตข้อมูลลงแถวเดิมใน Google Sheets
         sheet.getRange(rowIndexToUpdate, 1, 1, 5).setValues([[
           new Date(),
           name,
@@ -182,13 +204,30 @@ function doPost(e) {
         
         return ContentService.createTextOutput(JSON.stringify({
           status: "success",
-          message: "แก้ไขข้อมูลและบันทึกรูปโปรไฟล์เรียบร้อยแล้ว" + uploadLog,
+          message: "แก้ไขข้อมูลสำเร็จเรียบร้อยแล้ว" + updateNotice,
           photoUrl: finalPhoto
         })).setMimeType(ContentService.MimeType.JSON);
       }
     }
     
-    // กรณี: ลงทะเบียนใหม่ (Register)
+    // ========================================================================
+    // กรณีที่ 2: ลงทะเบียนสมาชิกใหม่ (Register)
+    // ========================================================================
+    let photoUrl = "";
+    let uploadNotice = "";
+    
+    if (imageBase64 && imageBase64.length > 50) {
+      try {
+        const uploadedUrl = saveImageToDrive(imageBase64, "profile_" + email.replace(/[^a-zA-Z0-9]/g, "_"), imageMime);
+        if (uploadedUrl) {
+          photoUrl = uploadedUrl;
+          uploadNotice = " (บันทึกรูปโปรไฟล์เข้า Drive สำเร็จ)";
+        }
+      } catch (err) {
+        uploadNotice = " (เกิดข้อผิดพลาดในการบันทึกรูป: " + err.message + ")";
+      }
+    }
+    
     sheet.appendRow([
       new Date(),
       name,
@@ -199,7 +238,7 @@ function doPost(e) {
     
     return ContentService.createTextOutput(JSON.stringify({
       status: "success",
-      message: "ลงทะเบียนสำเร็จเรียบร้อยแล้ว" + uploadLog,
+      message: "ลงทะเบียนสมาชิกใหม่สำเร็จเรียบร้อยแล้ว" + uploadNotice,
       photoUrl: photoUrl
     })).setMimeType(ContentService.MimeType.JSON);
     
