@@ -1,6 +1,6 @@
 // ==========================================================================
 // Code.gs - Google Apps Script Backend (Web App)
-// รองรับ: ขอสิทธิ์ DriveApp, บันทึกรูปลง Drive, แปลงเป็น LH5, แก้ไขข้อมูล, และส่ง JSON
+// รองรับ: บันทึกรูปลง Drive (LH5), แก้ไขข้อมูล, ป้องกันเลข 0 หาย, และส่ง JSON
 // ==========================================================================
 
 // 1) กำหนด ID โฟลเดอร์ Google Drive สำหรับจัดเก็บรูปภาพ
@@ -12,24 +12,12 @@ const SHEET_NAME = "Sheet1";
 // ==========================================================================
 // 🚨 ฟังก์ชันบังคับเปิดหน้าต่างขอสิทธิ์ (ห้ามใส่ try-catch)
 // ==========================================================================
-/**
- * 👉 ให้เลือกฟังก์ชัน "grantPermission" แล้วกดปุ่ม ▶️ "เรียกใช้" (Run)
- * ฟังก์ชันนี้ไม่มี try-catch จึงจะบังคับให้ระบบ Google ดีดหน้าต่างขอสิทธิ์ออกมาทันที
- */
 function grantPermission() {
-  // 1. เรียกใช้งาน DriveApp ตรงๆ เพื่อบังคับให้ Google ขอสิทธิ์
   var folder = DriveApp.getFolderById(FOLDER_ID);
   var root = DriveApp.getRootFolder();
   var sheet = SpreadsheetApp.getActiveSpreadsheet();
   
   Logger.log("✅ ขอสิทธิ์ Google Drive สำเร็จแล้ว: " + folder.getName());
-}
-
-// ==========================================================================
-// 🔑 ฟังก์ชันสำหรับตรวจสอบสถานะสิทธิ์ Google Drive & Sheets
-// ==========================================================================
-function authorizeDriveAccess() {
-  grantPermission();
 }
 
 // --------------------------------------------------------------------------
@@ -69,9 +57,16 @@ function saveImageToDrive(base64Data, fileName, mimeType) {
   try {
     if (!base64Data || base64Data.length < 20) return "";
     
-    const folder = DriveApp.getFolderById(FOLDER_ID);
+    // พยายามเข้าถึงโฟลเดอร์ที่ระบุ หากไม่พบให้ใช้ Root Folder สำรอง
+    let folder;
+    try {
+      folder = DriveApp.getFolderById(FOLDER_ID);
+    } catch (e) {
+      Logger.log("ไม่พบโฟลเดอร์ตาม ID ใช้ Root Folder แทน: " + e.toString());
+      folder = DriveApp.getRootFolder();
+    }
     
-    // ตัด header ของ base64 ออกถ้ามี (เช่น data:image/png;base64,...)
+    // ตัด header ของ base64 ออกถ้ามี (เช่น data:image/jpeg;base64,...)
     let cleanBase64 = base64Data;
     let actualMime = mimeType || "image/jpeg";
     
@@ -86,6 +81,9 @@ function saveImageToDrive(base64Data, fileName, mimeType) {
       }
     }
     
+    // ลบช่องว่างและอักขระพิเศษออกจาก Base64
+    cleanBase64 = cleanBase64.replace(/[\s\r\n]+/g, "");
+    
     const decodedBytes = Utilities.base64Decode(cleanBase64);
     const timeStamp = new Date().getTime();
     const finalFileName = (fileName || "profile_" + timeStamp) + ".jpg";
@@ -93,17 +91,21 @@ function saveImageToDrive(base64Data, fileName, mimeType) {
     const blob = Utilities.newBlob(decodedBytes, actualMime, finalFileName);
     const file = folder.createFile(blob);
     
-    // ตั้งค่าสิทธิ์ให้ทุกคนที่มีลิงก์สามารถดูรูปภาพได้ (Public View)
-    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    // ตั้งค่าสิทธิ์ให้อ่านได้สาธารณะ
+    try {
+      file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    } catch (shareErr) {
+      Logger.log("Sharing notice: " + shareErr.toString());
+    }
     
-    // ----------------------------------------------------------------------
     // ส่งกลับลิงก์รูปภาพในรูปแบบ https://lh5.googleusercontent.com/d/{FILE_ID}
-    // ----------------------------------------------------------------------
     const fileId = file.getId();
-    return "https://lh5.googleusercontent.com/d/" + fileId;
+    const lh5Url = "https://lh5.googleusercontent.com/d/" + fileId;
+    Logger.log("✓ บันทึกรูปลง Drive สำเร็จ: " + lh5Url);
+    return lh5Url;
   } catch (err) {
-    Logger.log("Error saving to Drive: " + err.toString());
-    return "";
+    Logger.log("❌ ข้อผิดพลาดในการบันทึกภาพลง Drive: " + err.toString());
+    throw new Error("Drive Save Error: " + err.toString());
   }
 }
 
@@ -113,7 +115,7 @@ function saveImageToDrive(base64Data, fileName, mimeType) {
 function doPost(e) {
   try {
     const sheet = getSheet();
-    const data = e.parameter;
+    const data = e.parameter || {};
     const action = data.action || "register"; // "register" หรือ "update"
     
     const name = data.name ? data.name.trim() : "";
@@ -131,10 +133,17 @@ function doPost(e) {
     
     // จัดการอัปโหลดรูปภาพ และแปลงเป็นลิงก์ lh5
     let photoUrl = data.photoUrl ? convertToLh5Url(data.photoUrl) : "";
+    let uploadLog = "";
+    
     if (imageBase64 && imageBase64.length > 50) {
-      const uploadedUrl = saveImageToDrive(imageBase64, "profile_" + email.replace(/[^a-zA-Z0-9]/g, "_"), imageMime);
-      if (uploadedUrl) {
-        photoUrl = uploadedUrl;
+      try {
+        const uploadedUrl = saveImageToDrive(imageBase64, "profile_" + email.replace(/[^a-zA-Z0-9]/g, "_"), imageMime);
+        if (uploadedUrl) {
+          photoUrl = uploadedUrl;
+          uploadLog = " (อัปโหลดรูปสำเร็จ)";
+        }
+      } catch (uploadErr) {
+        uploadLog = " (รูปอัปโหลดไม่สำเร็จ: " + uploadErr.message + ")";
       }
     }
     
@@ -166,7 +175,7 @@ function doPost(e) {
         
         return ContentService.createTextOutput(JSON.stringify({
           status: "success",
-          message: "แก้ไขข้อมูลและบันทึกรูปโปรไฟล์ (lh5) เรียบร้อยแล้ว",
+          message: "แก้ไขข้อมูลและบันทึกรูปโปรไฟล์เรียบร้อยแล้ว" + uploadLog,
           photoUrl: finalPhoto
         })).setMimeType(ContentService.MimeType.JSON);
       }
@@ -183,7 +192,7 @@ function doPost(e) {
     
     return ContentService.createTextOutput(JSON.stringify({
       status: "success",
-      message: "ลงทะเบียนและบันทึกรูปโปรไฟล์ (lh5) สำเร็จเรียบร้อยแล้ว",
+      message: "ลงทะเบียนสำเร็จเรียบร้อยแล้ว" + uploadLog,
       photoUrl: photoUrl
     })).setMimeType(ContentService.MimeType.JSON);
     
