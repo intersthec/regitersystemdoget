@@ -10,14 +10,21 @@ const FOLDER_ID = "1hRl3JLjIxzFtdbbQMcSAuTdwHawZ2cBB";
 const SHEET_NAME = "Sheet1";
 
 // ==========================================================================
-// 🚨 ฟังก์ชันบังคับเปิดหน้าต่างขอสิทธิ์ (ห้ามใส่ try-catch)
+// 🚨 ฟังก์ชันบังคับขอสิทธิ์สร้างไฟล์ Google Drive (createFile)
 // ==========================================================================
 function grantPermission() {
+  // 1. เข้าถึงโฟลเดอร์ Google Drive
   var folder = DriveApp.getFolderById(FOLDER_ID);
-  var root = DriveApp.getRootFolder();
-  var sheet = SpreadsheetApp.getActiveSpreadsheet();
   
-  Logger.log("✅ ขอสิทธิ์ Google Drive สำเร็จแล้ว: " + folder.getName());
+  // 2. บังคับเรียก createFile เพื่อให้ Google ร้องขอสิทธิ์ https://www.googleapis.com/auth/drive
+  var testBlob = Utilities.newBlob("Drive Permission OK", "text/plain", "auth_test.txt");
+  var testFile = folder.createFile(testBlob);
+  testFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  
+  // 3. ลบไฟล์ทดสอบ
+  testFile.setTrashed(true);
+  
+  Logger.log("✅ สิทธิ์สร้างไฟล์ Google Drive (createFile) ผ่านสมบูรณ์แล้ว: " + folder.getName());
 }
 
 // --------------------------------------------------------------------------
