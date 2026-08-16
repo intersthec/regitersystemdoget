@@ -1,0 +1,2657 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEXORA — นวัตกรรมโซลูชันธุรกิจและสินค้าพรีเมียมแห่งอนาคต</title>
+  <meta name="description" content="ยกระดับธุรกิจของคุณด้วยโซลูชันเทคโนโลยีและผลิตภัณฑ์ระดับพรีเมียมจาก NEXORA นวัตกรรมที่ออกแบบมาเพื่อผลลัพธ์ที่เหนือกว่า">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       CSS Variables & Design Tokens
+       ========================================================================== */
+    :root {
+      /* Brand Color Palette */
+      --primary: #0284c7;
+      --primary-hover: #0369a1;
+      --primary-subtle: #e0f2fe;
+      --primary-rgb: 2, 132, 199;
+      
+      --accent: #0d9488;
+      --accent-hover: #0f766e;
+      --accent-subtle: #ccfbf1;
+
+      /* Base Light Theme */
+      --bg-body: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-surface-secondary: #f1f5f9;
+      --bg-surface-elevated: #ffffff;
+      
+      --border-subtle: #e2e8f0;
+      --border-strong: #cbd5e1;
+      
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --text-light: #94a3b8;
+      --text-inverse: #ffffff;
+
+      --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+      --card-shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+      --navbar-bg: rgba(255, 255, 255, 0.85);
+
+      /* Typography */
+      --font-th: 'Prompt', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-en: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+
+      /* Layout */
+      --container-max: 1200px;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-full: 9999px;
+      --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    [data-theme="dark"] {
+      --primary: #38bdf8;
+      --primary-hover: #0ea5e9;
+      --primary-subtle: rgba(56, 189, 248, 0.15);
+      --primary-rgb: 56, 189, 248;
+
+      --accent: #2dd4bf;
+      --accent-hover: #14b8a6;
+      --accent-subtle: rgba(45, 212, 191, 0.15);
+
+      --bg-body: #0b1120;
+      --bg-surface: #111827;
+      --bg-surface-secondary: #1e293b;
+      --bg-surface-elevated: #1f293d;
+
+      --border-subtle: #1e293b;
+      --border-strong: #334155;
+
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-light: #64748b;
+      --text-inverse: #0f172a;
+
+      --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+      --card-shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
+      --navbar-bg: rgba(11, 17, 32, 0.88);
+    }
+
+    /* ==========================================================================
+       Reset & Base Styles
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+    }
+
+    body {
+      font-family: var(--font-th);
+      background-color: var(--bg-body);
+      color: var(--text-main);
+      line-height: 1.65;
+      letter-spacing: -0.01em;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: var(--font-th);
+      color: var(--text-main);
+      font-weight: 600;
+      line-height: 1.3;
+      letter-spacing: -0.02em;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+      transition: var(--transition-smooth);
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    button, input, select, textarea {
+      font-family: inherit;
+      font-size: 1rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: var(--container-max);
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+
+    .section {
+      padding: 5.5rem 0;
+      position: relative;
+    }
+
+    .section-alt {
+      background-color: var(--bg-surface-secondary);
+    }
+
+    /* ==========================================================================
+       Header & Navigation
+       ========================================================================== */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: var(--navbar-bg);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border-subtle);
+      transition: var(--transition-smooth);
+    }
+
+    .nav-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 76px;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-weight: 700;
+      font-size: 1.35rem;
+      font-family: var(--font-en);
+      color: var(--text-main);
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      box-shadow: 0 4px 10px rgba(var(--primary-rgb), 0.3);
+    }
+
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      list-style: none;
+      gap: 2rem;
+    }
+
+    .nav-link {
+      font-weight: 500;
+      font-size: 0.975rem;
+      color: var(--text-muted);
+      position: relative;
+      padding: 0.35rem 0;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: var(--primary);
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background-color: var(--primary);
+      transition: width 0.25s ease;
+      border-radius: 2px;
+    }
+
+    .nav-link:hover::after, .nav-link.active::after {
+      width: 100%;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.65rem 1.35rem;
+      font-size: 0.95rem;
+      font-weight: 500;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: var(--transition-smooth);
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(var(--primary-rgb), 0.25);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(var(--primary-rgb), 0.35);
+    }
+
+    .btn-secondary {
+      background: var(--bg-surface);
+      color: var(--text-main);
+      border: 1px solid var(--border-strong);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-surface-secondary);
+      transform: translateY(-2px);
+    }
+
+    .btn-icon {
+      padding: 0.6rem;
+      border-radius: var(--radius-md);
+      background: var(--bg-surface-secondary);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition-smooth);
+    }
+
+    .btn-icon:hover {
+      background: var(--border-subtle);
+    }
+
+    .menu-toggle {
+      display: none;
+    }
+
+    /* ==========================================================================
+       Hero Section
+       ========================================================================== */
+    .hero-section {
+      padding-top: 9rem;
+      padding-bottom: 5.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 3.5rem;
+      align-items: center;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 0.9rem;
+      background: var(--primary-subtle);
+      color: var(--primary);
+      border-radius: var(--radius-full);
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 1.25rem;
+    }
+
+    .hero-title {
+      font-size: 3.1rem;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 1.25rem;
+      letter-spacing: -0.03em;
+    }
+
+    .hero-title .highlight {
+      color: var(--primary);
+    }
+
+    .hero-desc {
+      font-size: 1.125rem;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      max-width: 580px;
+      line-height: 1.7;
+    }
+
+    .hero-cta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2.75rem;
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 2.5rem;
+      padding-top: 1.75rem;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .stat-item h4 {
+      font-size: 1.85rem;
+      font-family: var(--font-en);
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 0.15rem;
+    }
+
+    .stat-item p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* Hero Visual Card */
+    .hero-visual {
+      position: relative;
+    }
+
+    .hero-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      box-shadow: var(--card-shadow-hover);
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .hero-status-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--accent);
+      background: var(--accent-subtle);
+      padding: 0.25rem 0.65rem;
+      border-radius: var(--radius-full);
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      background: currentColor;
+      border-radius: 50%;
+      animation: pulseDot 2s infinite ease-in-out;
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.8); }
+    }
+
+    .hero-preview-img {
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin-bottom: 1.25rem;
+      position: relative;
+      background: var(--bg-surface-secondary);
+      aspect-ratio: 16/10;
+    }
+
+    .hero-preview-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    .hero-card:hover .hero-preview-img img {
+      transform: scale(1.03);
+    }
+
+    .hero-metric-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .metric-box {
+      background: var(--bg-surface-secondary);
+      padding: 0.85rem 1rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .metric-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+
+    .metric-value {
+      font-size: 1.15rem;
+      font-weight: 700;
+      font-family: var(--font-en);
+      color: var(--text-main);
+    }
+
+    /* Floating badge */
+    .floating-badge {
+      position: absolute;
+      bottom: -15px;
+      left: -20px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      padding: 0.75rem 1.25rem;
+      border-radius: var(--radius-md);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      z-index: 3;
+    }
+
+    .floating-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #fef3c7;
+      color: #d97706;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ==========================================================================
+       Section Headers
+       ========================================================================== */
+    .section-header {
+      text-align: center;
+      max-width: 680px;
+      margin: 0 auto 3.5rem;
+    }
+
+    .section-tag {
+      display: inline-block;
+      font-size: 0.825rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .section-title {
+      font-size: 2.25rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .section-desc {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* ==========================================================================
+       Features Section
+       ========================================================================== */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2rem;
+    }
+
+    .feature-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      transition: var(--transition-smooth);
+      position: relative;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--card-shadow-hover);
+      border-color: var(--border-strong);
+    }
+
+    .feature-icon-wrapper {
+      width: 52px;
+      height: 52px;
+      border-radius: var(--radius-md);
+      background: var(--primary-subtle);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.25rem;
+      transition: var(--transition-smooth);
+    }
+
+    .feature-card:hover .feature-icon-wrapper {
+      background: var(--primary);
+      color: #ffffff;
+    }
+
+    .feature-title {
+      font-size: 1.25rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .feature-text {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    /* ==========================================================================
+       Products Showcase Section
+       ========================================================================== */
+    .filter-tabs {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-bottom: 3rem;
+    }
+
+    .tab-btn {
+      padding: 0.55rem 1.25rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-full);
+      color: var(--text-muted);
+      font-weight: 500;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+
+    .tab-btn:hover, .tab-btn.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+      box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.25);
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 2rem;
+    }
+
+    .product-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: var(--transition-smooth);
+    }
+
+    .product-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--card-shadow-hover);
+    }
+
+    .product-image-box {
+      position: relative;
+      aspect-ratio: 16/10;
+      overflow: hidden;
+      background: var(--bg-surface-secondary);
+    }
+
+    .product-image-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+
+    .product-card:hover .product-image-box img {
+      transform: scale(1.05);
+    }
+
+    .product-tag {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(4px);
+      color: #ffffff;
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--radius-full);
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .product-content {
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    .product-category {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--primary);
+      text-transform: uppercase;
+      margin-bottom: 0.35rem;
+    }
+
+    .product-name {
+      font-size: 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .product-description {
+      color: var(--text-muted);
+      font-size: 0.925rem;
+      margin-bottom: 1.25rem;
+      line-height: 1.55;
+    }
+
+    .product-specs {
+      list-style: none;
+      margin-bottom: 1.5rem;
+      margin-top: auto;
+    }
+
+    .product-specs li {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .product-specs li svg {
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .product-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .product-price {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .price-sub {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .price-main {
+      font-size: 1.35rem;
+      font-weight: 700;
+      font-family: var(--font-en);
+      color: var(--text-main);
+    }
+
+    /* ==========================================================================
+       Interactive ROI / Calculator Section
+       ========================================================================== */
+    .calculator-wrapper {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 3rem;
+      box-shadow: var(--card-shadow);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: center;
+    }
+
+    .calc-input-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .calc-label {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 500;
+      font-size: 0.95rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .calc-range {
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: var(--border-strong);
+      outline: none;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    .calc-result-box {
+      background: var(--bg-surface-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .result-number {
+      font-size: 2.75rem;
+      font-weight: 800;
+      font-family: var(--font-en);
+      color: var(--primary);
+      margin: 0.5rem 0;
+    }
+
+    /* ==========================================================================
+       Pricing Plans Section
+       ========================================================================== */
+    .pricing-toggle-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 3rem;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 52px;
+      height: 28px;
+      background-color: var(--border-strong);
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+
+    .toggle-switch.active {
+      background-color: var(--primary);
+    }
+
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 22px;
+      height: 22px;
+      background-color: #ffffff;
+      border-radius: 50%;
+      transition: var(--transition-smooth);
+    }
+
+    .toggle-switch.active::after {
+      transform: translateX(24px);
+    }
+
+    .save-badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: #fef08a;
+      color: #854d0e;
+      padding: 0.2rem 0.5rem;
+      border-radius: var(--radius-full);
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      align-items: stretch;
+    }
+
+    .pricing-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      transition: var(--transition-smooth);
+      position: relative;
+    }
+
+    .pricing-card.popular {
+      border: 2px solid var(--primary);
+      box-shadow: 0 10px 30px rgba(var(--primary-rgb), 0.15);
+      transform: scale(1.03);
+    }
+
+    .popular-tag {
+      position: absolute;
+      top: -13px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--primary);
+      color: #ffffff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.25rem 0.85rem;
+      border-radius: var(--radius-full);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .plan-name {
+      font-size: 1.35rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .plan-desc {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+
+    .plan-price-wrap {
+      margin-bottom: 1.75rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .plan-price {
+      font-size: 2.5rem;
+      font-weight: 800;
+      font-family: var(--font-en);
+      color: var(--text-main);
+    }
+
+    .plan-period {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .plan-features {
+      list-style: none;
+      margin-bottom: 2rem;
+      flex-grow: 1;
+    }
+
+    .plan-features li {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      font-size: 0.925rem;
+      color: var(--text-muted);
+      margin-bottom: 0.85rem;
+    }
+
+    .plan-features li svg {
+      color: var(--primary);
+      flex-shrink: 0;
+    }
+
+    /* ==========================================================================
+       Testimonials Section
+       ========================================================================== */
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2rem;
+    }
+
+    .testimonial-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: var(--card-shadow);
+    }
+
+    .testimonial-rating {
+      color: #f59e0b;
+      margin-bottom: 1rem;
+      display: flex;
+      gap: 0.2rem;
+    }
+
+    .testimonial-text {
+      font-size: 0.975rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+      font-style: italic;
+    }
+
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .author-avatar {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .author-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .author-role {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* ==========================================================================
+       FAQ Accordion
+       ========================================================================== */
+    .faq-wrapper {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .faq-item {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      margin-bottom: 1rem;
+      overflow: hidden;
+      transition: var(--transition-smooth);
+    }
+
+    .faq-question {
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1.05rem;
+      user-select: none;
+    }
+
+    .faq-icon {
+      transition: transform 0.3s ease;
+      color: var(--primary);
+    }
+
+    .faq-item.active .faq-icon {
+      transform: rotate(180deg);
+    }
+
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease, padding 0.35s ease;
+      background: var(--bg-surface);
+    }
+
+    .faq-item.active .faq-answer {
+      max-height: 250px;
+      padding: 0 1.5rem 1.25rem;
+    }
+
+    .faq-answer p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    /* ==========================================================================
+       Contact & Lead Form Section
+       ========================================================================== */
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.25fr;
+      gap: 3.5rem;
+      align-items: start;
+    }
+
+    .contact-info h3 {
+      font-size: 1.85rem;
+      margin-bottom: 1rem;
+    }
+
+    .contact-info p {
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      line-height: 1.65;
+    }
+
+    .info-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .info-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .info-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      background: var(--primary-subtle);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .info-text-title {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .info-text-value {
+      font-weight: 600;
+      font-size: 0.975rem;
+    }
+
+    /* Contact Form Card */
+    .contact-form-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem;
+      box-shadow: var(--card-shadow);
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 0.4rem;
+      color: var(--text-main);
+    }
+
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: var(--bg-body);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      color: var(--text-main);
+      transition: var(--transition-smooth);
+      outline: none;
+    }
+
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.15);
+      background: var(--bg-surface);
+    }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 110px;
+    }
+
+    /* ==========================================================================
+       Footer
+       ========================================================================== */
+    .footer {
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border-subtle);
+      padding: 4.5rem 0 2rem;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr 1fr;
+      gap: 2.5rem;
+      margin-bottom: 3.5rem;
+    }
+
+    .footer-about p {
+      color: var(--text-muted);
+      font-size: 0.925rem;
+      margin: 1rem 0 1.5rem;
+      max-width: 320px;
+      line-height: 1.6;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .social-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-surface-secondary);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      transition: var(--transition-smooth);
+    }
+
+    .social-btn:hover {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+
+    .footer-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 1.25rem;
+    }
+
+    .footer-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+
+    .footer-links a {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .footer-links a:hover {
+      color: var(--primary);
+      padding-left: 4px;
+    }
+
+    .footer-bottom {
+      padding-top: 2rem;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* ==========================================================================
+       Modal & Toast Notifications
+       ========================================================================== */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(6px);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      opacity: 0;
+      visibility: hidden;
+      transition: var(--transition-smooth);
+    }
+
+    .modal-backdrop.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      max-width: 600px;
+      width: 100%;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      transform: scale(0.95);
+      transition: transform 0.25s ease;
+    }
+
+    .modal-backdrop.active .modal-box {
+      transform: scale(1);
+    }
+
+    .modal-header {
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .modal-close {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      line-height: 1;
+    }
+
+    .modal-body {
+      padding: 1.5rem;
+      max-height: 75vh;
+      overflow-y: auto;
+    }
+
+    /* Toast Notification */
+    .toast-container {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 3000;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .toast {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius-md);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      animation: slideInToast 0.3s ease forwards;
+    }
+
+    .toast-success {
+      border-left: 4px solid #10b981;
+    }
+
+    @keyframes slideInToast {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* Back To Top Button */
+    .back-to-top {
+      position: fixed;
+      bottom: 2rem;
+      left: 2rem;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      box-shadow: var(--card-shadow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      visibility: hidden;
+      transition: var(--transition-smooth);
+      z-index: 999;
+    }
+
+    .back-to-top.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .back-to-top:hover {
+      background: var(--primary);
+      color: #ffffff;
+    }
+
+    /* ==========================================================================
+       Responsive Breakpoints
+       ========================================================================== */
+    @media (max-width: 1024px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+      }
+      .hero-visual {
+        max-width: 550px;
+        margin: 0 auto;
+      }
+      .calculator-wrapper {
+        grid-template-columns: 1fr;
+      }
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .hero-title {
+        font-size: 2.25rem;
+      }
+      .nav-menu {
+        position: fixed;
+        top: 76px;
+        left: 0;
+        right: 0;
+        background: var(--bg-surface);
+        flex-direction: column;
+        padding: 2rem 1.5rem;
+        gap: 1.25rem;
+        border-bottom: 1px solid var(--border-subtle);
+        transform: translateY(-150%);
+        transition: transform 0.3s ease;
+        box-shadow: var(--card-shadow-hover);
+      }
+      .nav-menu.open {
+        transform: translateY(0);
+      }
+      .menu-toggle {
+        display: flex;
+      }
+      .contact-grid {
+        grid-template-columns: 1fr;
+      }
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+      .pricing-card.popular {
+        transform: none;
+      }
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==========================================
+       Navigation Bar
+       ========================================== -->
+  <header class="header" id="header">
+    <div class="container nav-container">
+      <!-- Brand Logo -->
+      <a href="#home" class="brand-logo">
+        <div class="brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+            <polyline points="2 17 12 22 22 17"></polyline>
+            <polyline points="2 12 12 17 22 12"></polyline>
+          </svg>
+        </div>
+        <span>NEXORA</span>
+      </a>
+
+      <!-- Navigation Links -->
+      <ul class="nav-menu" id="navMenu">
+        <li><a href="#home" class="nav-link active">หน้าแรก</a></li>
+        <li><a href="#features" class="nav-link">จุดเด่น</a></li>
+        <li><a href="#products" class="nav-link">สินค้า & โซลูชัน</a></li>
+        <li><a href="#roi" class="nav-link">คำนวณความคุ้มค่า</a></li>
+        <li><a href="#pricing" class="nav-link">แพ็กเกจราคา</a></li>
+        <li><a href="#faq" class="nav-link">คำถามที่พบบ่อย</a></li>
+        <li><a href="#contact" class="nav-link">ติดต่อเรา</a></li>
+      </ul>
+
+      <!-- Action Buttons & Theme Toggle -->
+      <div class="nav-actions">
+        <button class="btn-icon" id="themeToggle" title="เปลี่ยนโหมดสี (Light/Dark)" aria-label="สลับธีม">
+          <svg id="moonIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+          <svg id="sunIcon" style="display: none;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+        </button>
+
+        <a href="#contact" class="btn btn-primary">เริ่มต้นใช้งานฟรี</a>
+
+        <button class="btn-icon menu-toggle" id="menuToggle" aria-label="เปิดเมนู">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==========================================
+       Hero Section
+       ========================================== -->
+  <section class="hero-section" id="home">
+    <div class="container hero-grid">
+      <div class="hero-content">
+        <div class="hero-badge">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          เวอร์ชันใหม่ 2026 พร้อมระบบอัจฉริยะเต็มรูปแบบ
+        </div>
+        <h1 class="hero-title">
+          พลิกโฉมธุรกิจของคุณด้วย <span class="highlight">นวัตกรรมระดับพรีเมียม</span>
+        </h1>
+        <p class="hero-desc">
+          NEXORA มอบโซลูชันซอฟต์แวร์ อุปกรณ์อัจฉริยะ และระบบจัดการธุรกิจแบบครบวงจร ออกแบบมาเพื่อเพิ่มประสิทธิภาพ ลดต้นทุน และขับเคลื่อนการเติบโตอย่างยั่งยืน
+        </p>
+
+        <div class="hero-cta">
+          <a href="#products" class="btn btn-primary">
+            สำรวจสินค้าและบริการ
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
+          <a href="#roi" class="btn btn-secondary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            คำนวณผลตอบแทน
+          </a>
+        </div>
+
+        <div class="hero-stats">
+          <div class="stat-item">
+            <h4>99.9%</h4>
+            <p>ความเสถียรของระบบ</p>
+          </div>
+          <div class="stat-item">
+            <h4>45,000+</h4>
+            <p>ผู้ใช้งานทั่วประเทศ</p>
+          </div>
+          <div class="stat-item">
+            <h4>4.9/5</h4>
+            <p>คะแนนความพึงพอใจ</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hero Visual Card -->
+      <div class="hero-visual">
+        <div class="hero-card">
+          <div class="hero-card-header">
+            <div>
+              <h3 style="font-size: 1.05rem;">ศูนย์ควบคุมอัจฉริยะ</h3>
+              <p style="font-size: 0.8rem; color: var(--text-muted);">Real-time Ecosystem Monitor</p>
+            </div>
+            <span class="hero-status-tag">
+              <span class="status-dot"></span>
+              ระบบทำงานปกติ
+            </span>
+          </div>
+
+          <div class="hero-preview-img">
+            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop" alt="Dashboard Preview" loading="lazy">
+          </div>
+
+          <div class="hero-metric-grid">
+            <div class="metric-box">
+              <div class="metric-label">ประสิทธิภาพการทำงาน</div>
+              <div class="metric-value">+148% ⚡</div>
+            </div>
+            <div class="metric-box">
+              <div class="metric-label">เวลาที่ประหยัดได้ต่อวัน</div>
+              <div class="metric-value">4.2 ชม. ⏱️</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Floating Badge -->
+        <div class="floating-badge">
+          <div class="floating-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+            </svg>
+          </div>
+          <div>
+            <div style="font-size: 0.85rem; font-weight: 700;">การันตีคุณภาพยอดเยี่ยม</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);">รางวัลนวัตกรรมประจำปี 2025</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       Features Section (จุดเด่น)
+       ========================================== -->
+  <section class="section section-alt" id="features">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">ทำไมต้องเลือกเรา</span>
+        <h2 class="section-title">มาตรฐานใหม่ของประสิทธิภาพธุรกิจ</h2>
+        <p class="section-desc">เราผสานรวมเทคโนโลยีชั้นนำเข้ากับการออกแบบที่เข้าใจง่าย เพื่อให้คุณขับเคลื่อนองค์กรได้อย่างคล่องตัว</p>
+      </div>
+
+      <div class="features-grid">
+        <!-- Feature 1 -->
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
+            </svg>
+          </div>
+          <h3 class="feature-title">AI & Automation อัจฉริยะ</h3>
+          <p class="feature-text">ระบบวิเคราะห์และประมวลผลงานซ้ำซ้อนอัตโนมัติ ช่วยลดความผิดพลาดและประหยัดเวลาการทำงานของทีมได้มากกว่า 50%</p>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+          </div>
+          <h3 class="feature-title">ความปลอดภัยระดับองค์กร</h3>
+          <p class="feature-text">การเข้ารหัสข้อมูลแบบ End-to-End Encryption พร้อมมาตรฐาน ISO/IEC 27001 รับประกันข้อมูลของคุณปลอดภัยสูงสุด</p>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+              <line x1="8" y1="21" x2="16" y2="21"></line>
+              <line x1="12" y1="17" x2="12" y2="21"></line>
+            </svg>
+          </div>
+          <h3 class="feature-title">เชื่อมต่อได้ทุกอุปกรณ์</h3>
+          <p class="feature-text">ทำงานได้อย่างไร้รอยต่อทั้งบนคอมพิวเตอร์ แท็บเล็ต และสมาร์ทโฟน เข้าถึงข้อมูลสำคัญได้ทุกที่ทุกเวลาที่คุณต้องการ</p>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+          </div>
+          <h3 class="feature-title">รายงานและสถิติเรียลไทม์</h3>
+          <p class="feature-text">แดชบอร์ดสรุปผลภาพรวมธุรกิจแบบทันเหตุการณ์ ช่วยให้คุณตัดสินใจเชิงกลยุทธ์ได้อย่างแม่นยำและรวดเร็ว</p>
+        </div>
+
+        <!-- Feature 5 -->
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 16v1a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v1"></path>
+              <path d="M18 8h4a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-4"></path>
+              <circle cx="8" cy="12" r="2"></circle>
+            </svg>
+          </div>
+          <h3 class="feature-title">API & Webhook Integrations</h3>
+          <p class="feature-text">รองรับการเชื่อมต่อกับระบบเดิม, Google Workspace, LINE OA, ERP และบริการคลาวด์ชั้นนำได้อย่างง่ายดาย</p>
+        </div>
+
+        <!-- Feature 6 -->
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+            </svg>
+          </div>
+          <h3 class="feature-title">ทีมผู้เชี่ยวชาญดูแล 24/7</h3>
+          <p class="feature-text">พร้อมให้คำปรึกษาและแก้ไขปัญหาโดยทีมวิศวกรและผู้เชี่ยวชาญเฉพาะทางตลอด 24 ชั่วโมง ไม่มีวันหยุด</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       Products & Showcase Section
+       ========================================== -->
+  <section class="section" id="products">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">แคตตาล็อกสินค้า & บริการ</span>
+        <h2 class="section-title">โซลูชันที่คัดสรรเพื่อตอบโจทย์คุณ</h2>
+        <p class="section-desc">เลือกชมผลิตภัณฑ์และระบบนวัตกรรมที่พร้อมปรับแต่งให้เข้ากับรูปแบบธุรกิจของคุณ</p>
+      </div>
+
+      <!-- Filter Category Tabs -->
+      <div class="filter-tabs">
+        <button class="tab-btn active" data-filter="all">ทั้งหมด (All)</button>
+        <button class="tab-btn" data-filter="software">ซอฟต์แวร์ & ระบบบริหาร (Software)</button>
+        <button class="tab-btn" data-filter="hardware">อุปกรณ์อัจฉริยะ (Hardware)</button>
+        <button class="tab-btn" data-filter="cloud">บริการคลาวด์ & AI (Cloud & AI)</button>
+      </div>
+
+      <!-- Products Grid -->
+      <div class="products-grid" id="productsContainer">
+        <!-- Product 1 -->
+        <div class="product-card" data-category="software">
+          <div class="product-image-box">
+            <span class="product-tag">ยอดนิยม</span>
+            <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop" alt="Nexora Cloud ERP">
+          </div>
+          <div class="product-content">
+            <span class="product-category">Software Platform</span>
+            <h3 class="product-name">Nexora Cloud ERP Suite</h3>
+            <p class="product-description">ระบบบริหารจัดการองค์กรแบบครบวงจร ทั้งการเงิน คลังสินค้า บุคลากร และงานขายในที่เดียว</p>
+            <ul class="product-specs">
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                รองรับผู้ใช้ไม่จำกัด & Cloud Auto-scaling
+              </li>
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                รายงานบัญชีและภาษีถูกต้องตามกฎหมาย
+              </li>
+            </ul>
+            <div class="product-footer">
+              <div class="product-price">
+                <span class="price-sub">เริ่มต้นเพียง</span>
+                <span class="price-main">฿2,490 <span style="font-size: 0.8rem; font-weight: normal; color: var(--text-muted);">/เดือน</span></span>
+              </div>
+              <button class="btn btn-secondary" onclick="openProductModal('Nexora Cloud ERP Suite', 'ระบบจัดการข้อมูลธุรกิจแบบบูรณาการ รวมการจัดการคลังสินค้า ระบบบัญชี งานขาย และ HR ไว้ในหน้าต่างเดียว พร้อม Dashboard วิเคราะห์ผลลัพธ์แบบเรียลไทม์', '฿2,490/เดือน')">ดูข้อมูล</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product 2 -->
+        <div class="product-card" data-category="hardware">
+          <div class="product-image-box">
+            <span class="product-tag">นวัตกรรม</span>
+            <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=800&auto=format&fit=crop" alt="Smart Terminal Hub">
+          </div>
+          <div class="product-content">
+            <span class="product-category">Smart Hardware</span>
+            <h3 class="product-name">Nexora Smart Terminal Pro</h3>
+            <p class="product-description">อุปกรณ์ควบคุมหน้าร้านและบันทึกเวลาอัจฉริยะ รองรับการสแกนใบหน้า, NFC และ QR Payment</p>
+            <ul class="product-specs">
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                สแกนรวดเร็วใน 0.2 วินาที พร้อม AI ป้องกันรูปถ่าย
+              </li>
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                หน้าจอทัชสกรีน IPS 10.1 นิ้ว คมชัดสูง
+              </li>
+            </ul>
+            <div class="product-footer">
+              <div class="product-price">
+                <span class="price-sub">ราคาพิเศษ</span>
+                <span class="price-main">฿14,900</span>
+              </div>
+              <button class="btn btn-secondary" onclick="openProductModal('Nexora Smart Terminal Pro', 'ฮาร์ดแวร์สำหรับจุดชำระเงินและระบบ Check-in องค์กรที่ทนทานสูง ทำงานได้แม้สัญญาณอินเทอร์เน็ตขาดหาย พร้อมระบบ Sync อัตโนมัติเมื่อต่อเน็ต', '฿14,900')">ดูข้อมูล</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product 3 -->
+        <div class="product-card" data-category="cloud">
+          <div class="product-image-box">
+            <span class="product-tag">AI Powered</span>
+            <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800&auto=format&fit=crop" alt="AI Agent Engine">
+          </div>
+          <div class="product-content">
+            <span class="product-category">Cloud & AI Service</span>
+            <h3 class="product-name">Cognitive AI Automation Engine</h3>
+            <p class="product-description">โมเดล AI สำหรับตอบแชทลูกค้าอัตโนมัติ วิเคราะห์เอกสารสัญญา และคาดการณ์ยอดขายล่วงหน้า</p>
+            <ul class="product-specs">
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                เทรนภาษาไทยและภาษาอังกฤษเฉพาะทางแม่นยำสูง
+              </li>
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                เชื่อมต่อ LINE, Facebook Messenger, Website API
+              </li>
+            </ul>
+            <div class="product-footer">
+              <div class="product-price">
+                <span class="price-sub">เริ่มต้นเพียง</span>
+                <span class="price-main">฿4,900 <span style="font-size: 0.8rem; font-weight: normal; color: var(--text-muted);">/เดือน</span></span>
+              </div>
+              <button class="btn btn-secondary" onclick="openProductModal('Cognitive AI Automation Engine', 'ระบบ AI ช่วยตอบคำถามและปิดการขายตลอด 24 ชั่วโมง พร้อมระบบวิเคราะห์อารมณ์ลูกค้าและสรุปประเด็นสำคัญส่งต่อเจ้าหน้าที่ทันที', '฿4,900/เดือน')">ดูข้อมูล</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product 4 -->
+        <div class="product-card" data-category="software">
+          <div class="product-image-box">
+            <span class="product-tag">แนะนำ</span>
+            <img src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?q=80&w=800&auto=format&fit=crop" alt="CRM & Sales Flow">
+          </div>
+          <div class="product-content">
+            <span class="product-category">Software Platform</span>
+            <h3 class="product-name">OmniChannel CRM & POS</h3>
+            <p class="product-description">ระบบบริหารลูกค้าสัมพันธ์และระบบขายหน้าร้าน รวมสต๊อกออนไลน์และออฟไลน์เข้าด้วยกัน</p>
+            <ul class="product-specs">
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                ระบบสะสมแต้มและคูปองสมาชิกแบบอัตโนมัติ
+              </li>
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                ตัดสต๊อกทันทีเมื่อมีการสั่งซื้อจากทุกช่องทาง
+              </li>
+            </ul>
+            <div class="product-footer">
+              <div class="product-price">
+                <span class="price-sub">เริ่มต้นเพียง</span>
+                <span class="price-main">฿1,890 <span style="font-size: 0.8rem; font-weight: normal; color: var(--text-muted);">/เดือน</span></span>
+              </div>
+              <button class="btn btn-secondary" onclick="openProductModal('OmniChannel CRM & POS', 'ระบบ CRM และ Point of Sale ที่ช่วยให้การบริการลูกค้าเป็นเรื่องง่าย ติดตามประวัติการซื้อ สร้างโปรโมชันเฉพาะกลุ่ม และเพิ่มยอดขายอย่างมีประสิทธิภาพ', '฿1,890/เดือน')">ดูข้อมูล</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product 5 -->
+        <div class="product-card" data-category="hardware">
+          <div class="product-image-box">
+            <span class="product-tag">IoT</span>
+            <img src="https://images.unsplash.com/photo-1563770660941-20978e870e26?q=80&w=800&auto=format&fit=crop" alt="IoT Sensor Gateway">
+          </div>
+          <div class="product-content">
+            <span class="product-category">Smart Hardware</span>
+            <h3 class="product-name">IoT Environment Gateway</h3>
+            <p class="product-description">เซนเซอร์ตรวจวัดอุณหภูมิ ความชื้น และสภาพแวดล้อม สำหรับคลังสินค้าและห้องเซิร์ฟเวอร์</p>
+            <ul class="product-specs">
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                แจ้งเตือนผ่าน LINE และ SMS ทันทีเมื่อเกิดความผิดปกติ
+              </li>
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                แบตเตอรี่สำรองใช้งานได้นานกว่า 72 ชั่วโมง
+              </li>
+            </ul>
+            <div class="product-footer">
+              <div class="product-price">
+                <span class="price-sub">ราคาเริ่มต้น</span>
+                <span class="price-main">฿8,500</span>
+              </div>
+              <button class="btn btn-secondary" onclick="openProductModal('IoT Environment Gateway', 'ระบบควบคุมสภาพแวดล้อมอัจฉริยะ ป้องกันความเสียหายของสินค้าและอุปกรณ์สำคัญ บันทึกประวัติข้อมูลย้อนหลังตามเกณฑ์มาตรฐานสากล', '฿8,500')">ดูข้อมูล</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product 6 -->
+        <div class="product-card" data-category="cloud">
+          <div class="product-image-box">
+            <span class="product-tag">Security</span>
+            <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=800&auto=format&fit=crop" alt="Cloud Vault Storage">
+          </div>
+          <div class="product-content">
+            <span class="product-category">Cloud & AI Service</span>
+            <h3 class="product-name">Secure Cloud Vault</h3>
+            <p class="product-description">พื้นที่จัดเก็บและสำรองข้อมูลองค์กรความเร็วสูง พร้อมระบบกู้คืนข้อมูลจาก Ransomware</p>
+            <ul class="product-specs">
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                สำรองข้อมูลอัตโนมัติทุกชั่วโมง (Snapshot Backup)
+              </li>
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                กำหนดสิทธิ์การเข้าถึงข้อมูลรายบุคคลอย่างละเอียด
+              </li>
+            </ul>
+            <div class="product-footer">
+              <div class="product-price">
+                <span class="price-sub">เริ่มต้นเพียง</span>
+                <span class="price-main">฿990 <span style="font-size: 0.8rem; font-weight: normal; color: var(--text-muted);">/เดือน</span></span>
+              </div>
+              <button class="btn btn-secondary" onclick="openProductModal('Secure Cloud Vault', 'ระบบ Cloud Storage เกรดองค์กร ปลอดภัย มั่นใจได้ด้วยระบบเข้ารหัสข้อมูลสองชั้นและศูนย์ข้อมูลมาตรฐาน Tier 4 ในประเทศไทย', '฿990/เดือน')">ดูข้อมูล</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       Interactive ROI Calculator
+       ========================================== -->
+  <section class="section section-alt" id="roi">
+    <div class="container">
+      <div class="calculator-wrapper">
+        <div>
+          <span class="section-tag">เครื่องคำนวณผลตอบแทน</span>
+          <h2 style="font-size: 2rem; margin-bottom: 1rem;">คำนวณความคุ้มค่าที่จะได้รับ</h2>
+          <p style="color: var(--text-muted); margin-bottom: 2rem;">ลองปรับจำนวนพนักงานและปริมาณงาน เพื่อดูว่า NEXORA จะช่วยประหยัดเวลาและค่าใช้จ่ายขององค์กรคุณได้มากเพียงใด</p>
+
+          <div class="calc-input-group">
+            <div class="calc-label">
+              <span>จำนวนพนักงานในทีม (คน)</span>
+              <strong id="employeesVal" style="color: var(--primary);">25</strong>
+            </div>
+            <input type="range" class="calc-range" id="employeesRange" min="5" max="200" value="25" step="5">
+          </div>
+
+          <div class="calc-input-group">
+            <div class="calc-label">
+              <span>ชั่วโมงทำงานเอกสาร/ซ้ำซ้อนต่อวัน (ชม./คน)</span>
+              <strong id="hoursVal" style="color: var(--primary);">3</strong>
+            </div>
+            <input type="range" class="calc-range" id="hoursRange" min="1" max="8" value="3" step="1">
+          </div>
+        </div>
+
+        <div class="calc-result-box">
+          <div style="font-size: 0.9rem; color: var(--text-muted); font-weight: 500;">คุณจะประหยัดต้นทุนได้ประมาณ</div>
+          <div class="result-number" id="savingsAmount">฿187,500</div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">บาท ต่อเดือน</div>
+
+          <div style="display: flex; justify-content: space-around; border-top: 1px solid var(--border-subtle); padding-top: 1.25rem;">
+            <div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">เวลาที่ได้คืนมา</div>
+              <div style="font-size: 1.25rem; font-weight: 700; color: var(--text-main);" id="timeSaved">1,500 ชม./ด.</div>
+            </div>
+            <div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">ประสิทธิภาพเพิ่มขึ้น</div>
+              <div style="font-size: 1.25rem; font-weight: 700; color: var(--accent);">+60%</div>
+            </div>
+          </div>
+
+          <a href="#contact" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem;">ขอรับข้อเสนอพิเศษสำหรับทีมคุณ</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       Pricing Plans Section
+       ========================================== -->
+  <section class="section" id="pricing">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">แผนราคาและแพ็กเกจ</span>
+        <h2 class="section-title">เลือกแพ็กเกจที่เหมาะกับขนาดธุรกิจของคุณ</h2>
+        <p class="section-desc">ไม่มีค่าธรรมเนียมแอบแฝง ปรับเปลี่ยนหรือยกเลิกได้ตลอดเวลา</p>
+      </div>
+
+      <!-- Billing Cycle Toggle -->
+      <div class="pricing-toggle-wrap">
+        <span id="monthlyLabel" style="font-weight: 600;">รายเดือน</span>
+        <div class="toggle-switch" id="billingToggle"></div>
+        <span id="annualLabel" style="color: var(--text-muted);">รายปี <span class="save-badge">ประหยัด 20%</span></span>
+      </div>
+
+      <div class="pricing-grid">
+        <!-- Starter Plan -->
+        <div class="pricing-card">
+          <h3 class="plan-name">Starter</h3>
+          <p class="plan-desc">เหมาะสำหรับธุรกิจเริ่มต้นหรือทีมขนาดเล็ก 1-10 คน</p>
+          <div class="plan-price-wrap">
+            <span class="plan-price" id="priceStarter">฿1,490</span>
+            <span class="plan-period">/เดือน</span>
+          </div>
+          <ul class="plan-features">
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              รองรับผู้ใช้งานสูงสุด 10 บัญชี
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              พื้นที่ Cloud Storage 50 GB
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              ระบบ POS และตัดสต๊อกพื้นฐาน
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              การสนับสนุนผ่าน Email ในเวลาทำการ
+            </li>
+          </ul>
+          <a href="#contact" class="btn btn-secondary" style="width: 100%;">เลือกแพ็กเกจนี้</a>
+        </div>
+
+        <!-- Professional Plan (Popular) -->
+        <div class="pricing-card popular">
+          <div class="popular-tag">คุ้มค่าที่สุด ⭐</div>
+          <h3 class="plan-name">Professional</h3>
+          <p class="plan-desc">สำหรับธุรกิจ SME ที่ต้องการขยายสาขาและระบบ AI อัจฉริยะ</p>
+          <div class="plan-price-wrap">
+            <span class="plan-price" id="pricePro">฿3,890</span>
+            <span class="plan-period">/เดือน</span>
+          </div>
+          <ul class="plan-features">
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              รองรับผู้ใช้งานสูงสุด 50 บัญชี
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              พื้นที่ Cloud Storage 500 GB
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              ระบบ AI Automation & Analytics เต็มรูปแบบ
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              เชื่อมต่อ LINE OA และ Webhook ไม่จำกัด
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              ทีมสนับสนุนแบบ Priority 24/7
+            </li>
+          </ul>
+          <a href="#contact" class="btn btn-primary" style="width: 100%;">เริ่มต้นใช้งาน Professional</a>
+        </div>
+
+        <!-- Enterprise Plan -->
+        <div class="pricing-card">
+          <h3 class="plan-name">Enterprise</h3>
+          <p class="plan-desc">โซลูชันแบบ Customization พิเศษสำหรับองค์กรขนาดใหญ่</p>
+          <div class="plan-price-wrap">
+            <span class="plan-price" id="priceEnterprise">฿9,900</span>
+            <span class="plan-period">/เดือน</span>
+          </div>
+          <ul class="plan-features">
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              ผู้ใช้งานไม่จำกัด (Unlimited Users)
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              พื้นที่จัดเก็บแบบ Dedicated Server
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              ปรับแต่งระบบและพัฒนาฟีเจอร์ตามความต้องการ
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              SLA 99.99% & ผู้จัดการดูแลบัญชีส่วนตัว (Dedicated AM)
+            </li>
+          </ul>
+          <a href="#contact" class="btn btn-secondary" style="width: 100%;">ติดต่อฝ่ายขายองค์กร</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       Testimonials Section
+       ========================================== -->
+  <section class="section section-alt">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">ความคิดเห็นจากผู้ใช้งานจริง</span>
+        <h2 class="section-title">ธุรกิจชั้นนำที่ไว้วางใจให้เราดูแล</h2>
+        <p class="section-desc">ฟังเสียงตอบรับจากผู้ประกอบการและผู้บริหารที่ยกระดับธุรกิจด้วย NEXORA</p>
+      </div>
+
+      <div class="testimonials-grid">
+        <!-- Testimonial 1 -->
+        <div class="testimonial-card">
+          <div>
+            <div class="testimonial-rating">
+              ★★★★★
+            </div>
+            <p class="testimonial-text">
+              "ตั้งแต่เปลี่ยนมาใช้ NEXORA ERP งานบัญชีและสต๊อกสินค้า 15 สาขาของเราไม่เคยตกหล่นเลย ระบบเร็วมาก ทีมซัพพอร์ตคอยช่วยเหลืออย่างมืออาชีพ ประทับใจมากครับ"
+            </p>
+          </div>
+          <div class="testimonial-author">
+            <img class="author-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop" alt="คุณพัชราภา">
+            <div>
+              <div class="author-name">คุณพัชราภา สุวรรณเวช</div>
+              <div class="author-role">Managing Director, Horizon Retail Group</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Testimonial 2 -->
+        <div class="testimonial-card">
+          <div>
+            <div class="testimonial-rating">
+              ★★★★★
+            </div>
+            <p class="testimonial-text">
+              "ฟังก์ชัน AI Automation ช่วยให้ทีมแอดมินตอบแชทลูกค้าได้ทันใจ 24 ชั่วโมง อัตราการปิดการขายของร้านเพิ่มขึ้นถึง 35% ภายในเดือนแรกที่ติดตั้ง แนะนำเลยครับ"
+            </p>
+          </div>
+          <div class="testimonial-author">
+            <img class="author-avatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop" alt="คุณธนกฤต">
+            <div>
+              <div class="author-name">คุณธนกฤต เมธากุล</div>
+              <div class="author-role">Founder & CEO, NexGen Commerce</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Testimonial 3 -->
+        <div class="testimonial-card">
+          <div>
+            <div class="testimonial-rating">
+              ★★★★★
+            </div>
+            <p class="testimonial-text">
+              "อุปกรณ์ Smart Terminal Pro สวยหรู ทนทาน และติดตั้งง่ายมาก พนักงานในออฟฟิศชอบทุกคน ใช้งานไม่ยาก รายงานเวลาเข้าออกแม่นยำ 100%"
+            </p>
+          </div>
+          <div class="testimonial-author">
+            <img class="author-avatar" src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&auto=format&fit=crop" alt="คุณกุลนันทน์">
+            <div>
+              <div class="author-name">คุณกุลนันทน์ รัตนภักดี</div>
+              <div class="author-role">Head of HR, Alpha Tech Solutions</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       FAQ Accordion Section
+       ========================================== -->
+  <section class="section" id="faq">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">คำถามที่พบบ่อย (FAQ)</span>
+        <h2 class="section-title">ข้อสงสัยเกี่ยวกับบริการของเรา</h2>
+        <p class="section-desc">รวมคำตอบสำหรับคำถามยอดฮิตเพื่อให้คุณเริ่มต้นใช้งานได้อย่างมั่นใจ</p>
+      </div>
+
+      <div class="faq-wrapper">
+        <div class="faq-item active">
+          <div class="faq-question">
+            <span>มีบริการทดลองใช้งานฟรีก่อนตัดสินใจซื้อหรือไม่?</span>
+            <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </div>
+          <div class="faq-answer">
+            <p>มีครับ! เราเปิดให้ทดลองใช้งานระบบเต็มรูปแบบฟรี 14 วัน โดยไม่ต้องกรอกข้อมูลบัตรเครดิต ทีมงานของเราจะช่วยตั้งค่าระบบเริ่มต้นให้พร้อมใช้งานทันที</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>สามารถนำเข้าข้อมูลจากระบบเดิม (Excel / ระบบเก่า) ได้หรือไม่?</span>
+            <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </div>
+          <div class="faq-answer">
+            <p>สามารถทำได้ง่ายดาย ระบบของเรารองรับการนำเข้าไฟล์ Excel, CSV หรือเชื่อมโยงผ่าน REST API โดยมีทีมผู้เชี่ยวชาญคอยอำนวยความสะดวกในการย้ายข้อมูล (Data Migration) ฟรี</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>ข้อมูลของบริษัทจะถูกจัดเก็บที่ไหน และปลอดภัยเพียงใด?</span>
+            <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </div>
+          <div class="faq-answer">
+            <p>ข้อมูลทั้งหมดจัดเก็บในศูนย์ข้อมูล Tier 4 มาตรฐานสากล เข้ารหัส 256-bit AES มีการสำรองข้อมูลอัตโนมัติหลายระดับ และปฏิบัติตาม พ.ร.บ. คุ้มครองข้อมูลส่วนบุคคล (PDPA) อย่างเคร่งครัด</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>หากต้องการปรับแต่งระบบเฉพาะธุรกิจ สามารถทำได้หรือไม่?</span>
+            <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </div>
+          <div class="faq-answer">
+            <p>สามารถทำได้ครับ สำหรับแพ็กเกจ Enterprise เรามีทีมซอฟต์แวร์เอ็นจิเนียร์ที่พร้อมวิเคราะห์และพัฒนาโมดูลพิเศษให้สอดคล้องกับ Workflow และโครงสร้างองค์กรของคุณอย่างลงตัว</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       Contact & Lead Form Section
+       ========================================== -->
+  <section class="section section-alt" id="contact">
+    <div class="container">
+      <div class="contact-grid">
+        <!-- Contact Information -->
+        <div class="contact-info">
+          <span class="section-tag">ติดต่อเรา</span>
+          <h3>ปรึกษาผู้เชี่ยวชาญ หรือขอใบเสนอราคา</h3>
+          <p>กรอกข้อมูลเพื่อให้ทีมงานติดต่อกลับพร้อมข้อเสนอพิเศษ หรือเข้ามาพูดคุยเพื่อรับคำแนะนำในการวางระบบสำหรับองค์กรของคุณ</p>
+
+          <ul class="info-list">
+            <li class="info-item">
+              <div class="info-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              </div>
+              <div>
+                <div class="info-text-title">ที่ตั้งสำนักงาน</div>
+                <div class="info-text-value">อาคารนวัตกรรมดิจิทัล ทาวเวอร์ ชั้น 18 ถ.สาทรใต้ กรุงเทพฯ 10120</div>
+              </div>
+            </li>
+
+            <li class="info-item">
+              <div class="info-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+              </div>
+              <div>
+                <div class="info-text-title">อีเมลติดต่อ</div>
+                <div class="info-text-value">contact@nexora-tech.com</div>
+              </div>
+            </li>
+
+            <li class="info-item">
+              <div class="info-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+              </div>
+              <div>
+                <div class="info-text-title">เบอร์โทรศัพท์</div>
+                <div class="info-text-value">02-999-8888 (จันทร์ - เสาร์ 08:30 - 18:00)</div>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Contact Form -->
+        <div class="contact-form-card">
+          <h3 style="font-size: 1.35rem; margin-bottom: 1.25rem;">แบบฟอร์มติดต่อขอข้อมูล / นัดหมายสาธิตระบบ</h3>
+          
+          <form id="leadContactForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="fullName">ชื่อ - นามสกุล *</label>
+                <input type="text" id="fullName" class="form-input" placeholder="เช่น คุณสมชาย ใจดี" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="companyName">ชื่อบริษัท / องค์กร</label>
+                <input type="text" id="companyName" class="form-input" placeholder="เช่น บริษัท ก้าวหน้า จำกัด">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="email">อีเมล *</label>
+                <input type="email" id="email" class="form-input" placeholder="name@company.com" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="phone">เบอร์โทรศัพท์ *</label>
+                <input type="tel" id="phone" class="form-input" placeholder="08x-xxx-xxxx" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="productInterest">โซลูชันที่สนใจ</label>
+              <select id="productInterest" class="form-select">
+                <option value="Nexora Cloud ERP Suite">Nexora Cloud ERP Suite</option>
+                <option value="Nexora Smart Terminal Pro">Nexora Smart Terminal Pro</option>
+                <option value="Cognitive AI Automation Engine">Cognitive AI Automation Engine</option>
+                <option value="OmniChannel CRM & POS">OmniChannel CRM & POS</option>
+                <option value="IoT Environment Gateway">IoT Environment Gateway</option>
+                <option value="Secure Cloud Vault">Secure Cloud Vault</option>
+                <option value="Custom Enterprise Solution">โซลูชันองค์กรแบบ Custom</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="message">รายละเอียดเพิ่มเติม หรือข้อกำหนดที่ต้องการ</label>
+              <textarea id="message" class="form-textarea" placeholder="ระบุสิ่งที่ต้องการให้เราช่วยเหลือ เช่น จำนวนสาขา ฟีเจอร์ที่ต้องการ..."></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.85rem;" id="submitBtn">
+              ส่งข้อมูลติดต่อทันที
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       Footer
+       ========================================== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <!-- Footer About -->
+        <div class="footer-about">
+          <a href="#home" class="brand-logo">
+            <div class="brand-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                <polyline points="2 17 12 22 22 17"></polyline>
+                <polyline points="2 12 12 17 22 12"></polyline>
+              </svg>
+            </div>
+            <span>NEXORA</span>
+          </a>
+          <p>ผู้นำด้านนวัตกรรมซอฟต์แวร์และฮาร์ดแวร์อัจฉริยะ มุ่งมั่นพัฒนาเทคโนโลยีเพื่อความสำเร็จของทุกธุรกิจในยุคดิจิทัล</p>
+          <div class="social-links">
+            <a href="#" class="social-btn" aria-label="Facebook">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+            </a>
+            <a href="#" class="social-btn" aria-label="LINE">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+            </a>
+            <a href="#" class="social-btn" aria-label="LinkedIn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div>
+          <h4 class="footer-title">ผลิตภัณฑ์ & โซลูชัน</h4>
+          <ul class="footer-links">
+            <li><a href="#products">Nexora Cloud ERP</a></li>
+            <li><a href="#products">Smart Terminal Pro</a></li>
+            <li><a href="#products">Cognitive AI Automation</a></li>
+            <li><a href="#products">OmniChannel CRM</a></li>
+            <li><a href="#products">Secure Cloud Vault</a></li>
+          </ul>
+        </div>
+
+        <!-- Resources -->
+        <div>
+          <h4 class="footer-title">ข้อมูลเพิ่มเติม</h4>
+          <ul class="footer-links">
+            <li><a href="#features">คุณสมบัติระบบ</a></li>
+            <li><a href="#roi">คำนวณผลตอบแทน</a></li>
+            <li><a href="#pricing">ตารางราคา</a></li>
+            <li><a href="#faq">คำถามที่พบบ่อย</a></li>
+            <li><a href="#contact">ติดต่อฝ่ายขาย</a></li>
+          </ul>
+        </div>
+
+        <!-- Legal & Compliance -->
+        <div>
+          <h4 class="footer-title">นโยบายและความปลอดภัย</h4>
+          <ul class="footer-links">
+            <li><a href="#">นโยบายความเป็นส่วนตัว (PDPA)</a></li>
+            <li><a href="#">ข้อกำหนดการให้บริการ</a></li>
+            <li><a href="#">มาตรฐานความปลอดภัย ISO 27001</a></li>
+            <li><a href="#">ศูนย์ความช่วยเหลือ (Help Center)</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>© 2026 NEXORA INNOVATION CO., LTD. สงวนลิขสิทธิ์ทุกประการ</div>
+        <div>Designed with precision for next-generation business</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==========================================
+       Product Detail Modal
+       ========================================== -->
+  <div class="modal-backdrop" id="productModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="modalTitle" style="font-size: 1.25rem;">รายละเอียดสินค้า</h3>
+        <button class="modal-close" onclick="closeProductModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="modalDesc" style="color: var(--text-muted); line-height: 1.7; margin-bottom: 1.5rem;"></p>
+        <div style="background: var(--bg-surface-secondary); padding: 1rem; border-radius: var(--radius-md); margin-bottom: 1.5rem;">
+          <div style="font-size: 0.85rem; color: var(--text-muted);">ราคาโดยประมาณ</div>
+          <div id="modalPrice" style="font-size: 1.5rem; font-weight: 700; color: var(--primary);"></div>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+          <button class="btn btn-primary" style="flex: 1;" onclick="selectProductFromModal()">สนใจรับข้อเสนอสินค้านี้</button>
+          <button class="btn btn-secondary" onclick="closeProductModal()">ปิดหน้าต่าง</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Back to Top Button -->
+  <button class="back-to-top" id="backToTop" title="กลับสู่ด้านบน" aria-label="กลับสู่ด้านบน">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <!-- ==========================================
+       Interactive Logic & JavaScript
+       ========================================== -->
+  <script>
+    // Theme Management (Light / Dark Mode)
+    const themeToggleBtn = document.getElementById('themeToggle');
+    const moonIcon = document.getElementById('moonIcon');
+    const sunIcon = document.getElementById('sunIcon');
+    const htmlElement = document.documentElement;
+
+    function applyTheme(theme) {
+      htmlElement.setAttribute('data-theme', theme);
+      if (theme === 'dark') {
+        moonIcon.style.display = 'none';
+        sunIcon.style.display = 'block';
+      } else {
+        moonIcon.style.display = 'block';
+        sunIcon.style.display = 'none';
+      }
+      localStorage.setItem('nexora_theme', theme);
+    }
+
+    const savedTheme = localStorage.getItem('nexora_theme') || 'light';
+    applyTheme(savedTheme);
+
+    themeToggleBtn.addEventListener('click', () => {
+      const currentTheme = htmlElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      applyTheme(newTheme);
+    });
+
+    // Mobile Navigation Drawer Toggle
+    const menuToggle = document.getElementById('menuToggle');
+    const navMenu = document.getElementById('navMenu');
+
+    menuToggle.addEventListener('click', () => {
+      navMenu.classList.toggle('open');
+    });
+
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        navMenu.classList.remove('open');
+      });
+    });
+
+    // Active Navigation Highlight on Scroll
+    const sections = document.querySelectorAll('section');
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    window.addEventListener('scroll', () => {
+      let currentSection = '';
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop - 120;
+        if (window.scrollY >= sectionTop) {
+          currentSection = section.getAttribute('id');
+        }
+      });
+
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === `#${currentSection}`) {
+          link.classList.add('active');
+        }
+      });
+
+      // Back to top button visibility
+      const backToTopBtn = document.getElementById('backToTop');
+      if (window.scrollY > 400) {
+        backToTopBtn.classList.add('visible');
+      } else {
+        backToTopBtn.classList.remove('visible');
+      }
+    });
+
+    document.getElementById('backToTop').addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // Product Category Filter
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const productCards = document.querySelectorAll('.product-card');
+
+    tabButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+
+        const filterValue = button.getAttribute('data-filter');
+
+        productCards.forEach(card => {
+          if (filterValue === 'all' || card.getAttribute('data-category') === filterValue) {
+            card.style.display = 'flex';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+
+    // Product Modal Handling
+    let currentModalProductName = '';
+    const productModal = document.getElementById('productModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalDesc = document.getElementById('modalDesc');
+    const modalPrice = document.getElementById('modalPrice');
+
+    function openProductModal(title, description, price) {
+      currentModalProductName = title;
+      modalTitle.textContent = title;
+      modalDesc.textContent = description;
+      modalPrice.textContent = price;
+      productModal.classList.add('active');
+    }
+
+    function closeProductModal() {
+      productModal.classList.remove('active');
+    }
+
+    function selectProductFromModal() {
+      closeProductModal();
+      const selectElement = document.getElementById('productInterest');
+      if (selectElement) {
+        for (let i = 0; i < selectElement.options.length; i++) {
+          if (selectElement.options[i].value.includes(currentModalProductName) || currentModalProductName.includes(selectElement.options[i].value)) {
+            selectElement.selectedIndex = i;
+            break;
+          }
+        }
+      }
+      const contactSection = document.getElementById('contact');
+      if (contactSection) {
+        contactSection.scrollIntoView({ behavior: 'smooth' });
+      }
+      showToast(`เลือกโซลูชัน "${currentModalProductName}" ในแบบฟอร์มเรียบร้อยแล้ว`, 'info');
+    }
+
+    productModal.addEventListener('click', (e) => {
+      if (e.target === productModal) {
+        closeProductModal();
+      }
+    });
+
+    // FAQ Accordion
+    const faqItems = document.querySelectorAll('.faq-item');
+    faqItems.forEach(item => {
+      const question = item.querySelector('.faq-question');
+      question.addEventListener('click', () => {
+        const isActive = item.classList.contains('active');
+        faqItems.forEach(i => i.classList.remove('active'));
+        if (!isActive) {
+          item.classList.add('active');
+        }
+      });
+    });
+
+    // Interactive ROI Calculator Logic
+    const employeesRange = document.getElementById('employeesRange');
+    const hoursRange = document.getElementById('hoursRange');
+    const employeesVal = document.getElementById('employeesVal');
+    const hoursVal = document.getElementById('hoursVal');
+    const savingsAmount = document.getElementById('savingsAmount');
+    const timeSaved = document.getElementById('timeSaved');
+
+    function calculateROI() {
+      const employees = parseInt(employeesRange.value);
+      const hours = parseInt(hoursRange.value);
+      
+      employeesVal.textContent = employees;
+      hoursVal.textContent = hours;
+
+      // Assumptions: 22 working days/month, avg hourly rate 250 THB, 45% efficiency boost
+      const workingDays = 22;
+      const hourlyRate = 250;
+      const hoursSavedPerMonth = Math.round(employees * hours * 0.45 * workingDays);
+      const moneySaved = Math.round(hoursSavedPerMonth * hourlyRate);
+
+      savingsAmount.textContent = `฿${moneySaved.toLocaleString()}`;
+      timeSaved.textContent = `${hoursSavedPerMonth.toLocaleString()} ชม./ด.`;
+    }
+
+    employeesRange.addEventListener('input', calculateROI);
+    hoursRange.addEventListener('input', calculateROI);
+    calculateROI();
+
+    // Pricing Billing Cycle Toggle (Monthly vs Annual with 20% discount)
+    const billingToggle = document.getElementById('billingToggle');
+    const priceStarter = document.getElementById('priceStarter');
+    const pricePro = document.getElementById('pricePro');
+    const priceEnterprise = document.getElementById('priceEnterprise');
+    const monthlyLabel = document.getElementById('monthlyLabel');
+    const annualLabel = document.getElementById('annualLabel');
+    let isAnnual = false;
+
+    billingToggle.addEventListener('click', () => {
+      isAnnual = !isAnnual;
+      billingToggle.classList.toggle('active', isAnnual);
+
+      if (isAnnual) {
+        priceStarter.textContent = '฿1,190';
+        pricePro.textContent = '฿3,110';
+        priceEnterprise.textContent = '฿7,920';
+        monthlyLabel.style.fontWeight = 'normal';
+        monthlyLabel.style.color = 'var(--text-muted)';
+        annualLabel.style.fontWeight = '600';
+        annualLabel.style.color = 'var(--text-main)';
+      } else {
+        priceStarter.textContent = '฿1,490';
+        pricePro.textContent = '฿3,890';
+        priceEnterprise.textContent = '฿9,900';
+        monthlyLabel.style.fontWeight = '600';
+        monthlyLabel.style.color = 'var(--text-main)';
+        annualLabel.style.fontWeight = 'normal';
+        annualLabel.style.color = 'var(--text-muted)';
+      }
+    });
+
+    // Toast Notification System
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      
+      const icon = type === 'success' ? '✓ ' : 'ℹ ';
+      toast.innerHTML = `<span style="font-weight: 700;">${icon}</span><span>${message}</span>`;
+      
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        toast.style.transition = 'all 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
+
+    // Contact Form Submission & Lead Capture Handler
+    const leadForm = document.getElementById('leadContactForm');
+    const submitBtn = document.getElementById('submitBtn');
+
+    leadForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const fullName = document.getElementById('fullName').value.trim();
+      const companyName = document.getElementById('companyName').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const product = document.getElementById('productInterest').value;
+      const message = document.getElementById('message').value.trim();
+
+      if (!fullName || !email || !phone) {
+        showToast('กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน', 'error');
+        return;
+      }
+
+      // Simulate sending / submitting lead
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = 'กำลังส่งข้อมูล...';
+
+      setTimeout(() => {
+        // Save to localStorage as a lead register record
+        const leads = JSON.parse(localStorage.getItem('nexora_leads') || '[]');
+        leads.push({
+          fullName,
+          companyName,
+          email,
+          phone,
+          product,
+          message,
+          timestamp: new Date().toISOString()
+        });
+        localStorage.setItem('nexora_leads', JSON.stringify(leads));
+
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `ส่งข้อมูลติดต่อเรียบร้อย <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+        
+        showToast(`ขอบคุณคุณ ${fullName}! ทีมงานได้รับข้อมูลแล้ว และจะติดต่อกลับภายใน 24 ชม.`, 'success');
+        leadForm.reset();
+
+        setTimeout(() => {
+          submitBtn.innerHTML = `ส่งข้อมูลติดต่อทันที <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>`;
+        }, 3000);
+      }, 800);
+    });
+  </script>
+</body>
+</html>
